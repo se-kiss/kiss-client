@@ -2,6 +2,7 @@
   "name": "kiss-client",
   "version": "1.0.0",
   "main": "src/",
+  "package-name": "git+https://<github_token>:x-oauth-basic@github.com/<user>/<repo>.git",
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
