@@ -19,10 +19,10 @@ const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
     <div>
       <Navbar />
 
-      <PageContainer className="px-8 flex flex-row justify-center">
+      <PageContainer className="px-8 pt-14 flex flex-row justify-center">
         <div className="flex-1 h-full flex flex-row justify-center pt-8">
           {SideComponent && (
-            <div className="w-60 h-60 bg-white fixed shadow-lg">
+            <div className="w-auto lg:w-60 h-auto bg-white fixed shadow-lg">
               <SideComponent />
             </div>
           )}
