@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {FC} from 'react'
 import styled from 'styled-components'
 
@@ -5,7 +6,7 @@ const Container = styled.div`
   background: #d8e6f3;
 `
 
-const Brand = styled.h1`
+const BrandText = styled.h1`
   color: #626aaa;
 `
 
@@ -37,7 +38,10 @@ const NavbarEnd: FC = () => {
 const Navbar: FC = () => {
   return (
     <Container className="fixed w-full h-14 bg-gray-200 px-12 flex flex-row  justify-between items-center">
-      <Brand className="text-2xl font-bold">KiSS</Brand>
+      <Link href="/">
+        <BrandText className="text-2xl font-bold cursor-pointer">KiSS</BrandText>
+      </Link>
+
       <NavbarEnd />
     </Container>
   )
