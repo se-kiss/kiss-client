@@ -1,8 +1,14 @@
 import {NextPage} from 'next'
-import {FC} from 'react'
+import {FC, useContext} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {Layout} from '../../../../components'
+import {
+  MediaFormProvider,
+  MediaFormContext,
+  MediaTypes,
+  initialState as initialMediaState,
+} from '../../../../lib/MediaFormContext'
 import styled from 'styled-components'
 
 type MediaTypeProps = {
@@ -28,15 +34,18 @@ const MediaType = styled.div<MediaTypeProps>`
 `
 
 const SideBox: FC = () => {
+  const {state, dispatch} = useContext(MediaFormContext)
+
   const mediaTypes = [
     {
       name: 'Article',
       icon: faNewspaper,
-      active: true,
+      type: MediaTypes.Article,
     },
     {
       name: 'Video',
       icon: faVideo,
+      type: MediaTypes.Video,
     },
   ]
 
@@ -44,11 +53,12 @@ const SideBox: FC = () => {
     <div className="px-4 pt-4">
       <h1 className="text-lg font-bold">Select Media Type</h1>
       <div className="mt-4">
-        {mediaTypes.map(({name, icon, active = false}) => (
+        {mediaTypes.map(({name, icon, type}) => (
           <MediaType
             key={name}
             className="flex flex-row items-center rounded my-2 py-2 pl-2 cursor-pointer"
-            active={active}
+            active={type === state.mediaType}
+            onClick={() => dispatch({...initialMediaState, mediaType: type})}
           >
             <FontAwesomeIcon icon={icon} className="mr-4" />
             <h4 className="text-lg font-medium">{name}</h4>
@@ -73,13 +83,28 @@ const ArticleForm: FC = () => {
   )
 }
 
+const Form: FC = () => {
+  const {state} = useContext(MediaFormContext)
+
+  switch (state.mediaType) {
+    case MediaTypes.Article:
+      return <ArticleForm />
+    case MediaTypes.Video:
+      return null
+    default:
+      return null
+  }
+}
+
 const MediaForm: NextPage = () => {
   return (
-    <Layout SideComponent={SideBox}>
-      <div className="bg-white w-10/12 h-full mx-auto mt-2 px-10 rounded shadow">
-        <ArticleForm />
-      </div>
-    </Layout>
+    <MediaFormProvider>
+      <Layout SideComponent={SideBox}>
+        <div className="bg-white w-10/12 h-full mx-auto mt-2 px-10 rounded shadow">
+          <Form />
+        </div>
+      </Layout>
+    </MediaFormProvider>
   )
 }
 
