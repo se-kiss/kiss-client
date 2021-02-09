@@ -7,6 +7,7 @@ import 'tailwindcss/tailwind.css'
 const GlobalStyle = createGlobalStyle`
   body {
     font-family: "Helvetica Neue", Helvetica, san-serif;
+    background: #f6fcff;
   }
 `
 
