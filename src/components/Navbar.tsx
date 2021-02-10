@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import {FC, useContext} from 'react'
+import {PlaylistForm} from './'
 import {ModalContext} from '../lib/ModalContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
@@ -36,10 +37,6 @@ const Button = styled.button`
     outline: none;
   }
 `
-
-const PlaylistForm: FC = () => {
-  return null
-}
 
 const NavbarEnd: FC = () => {
   const isLogin = true
