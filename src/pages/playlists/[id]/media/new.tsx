@@ -2,7 +2,7 @@ import {NextPage} from 'next'
 import {FC, useContext, useRef} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faNewspaper, faVideo, faUpload} from '@fortawesome/free-solid-svg-icons'
-import {Layout} from '../../../../components'
+import {Layout, HorizontalLine} from '../../../../components'
 import {
   MediaFormProvider,
   MediaFormContext,
@@ -37,12 +37,6 @@ const MediaType = styled.div<MediaTypeProps>`
   }
 `
 
-const HorizontalLine = styled.hr`
-  width: 100%;
-  border-color: #626aaa;
-  border-width: 1px;
-`
-
 const Button = styled.button`
   background: #267dcd;
   color: white;
@@ -74,7 +68,7 @@ const SideBox: FC = () => {
   ]
 
   return (
-    <div className="px-4 py-4">
+    <div className="p-4">
       <h1 className="text-lg font-bold">Select Media Type</h1>
 
       <div className="mt-4">
@@ -97,9 +91,9 @@ const SideBox: FC = () => {
         ))}
       </div>
 
-      <HorizontalLine />
+      <HorizontalLine className="my-4" />
 
-      <div className="mt-4">
+      <div>
         <Button className="w-full rounded text-xl font-medium my-1 py-1">
           Create
         </Button>
