@@ -1,5 +1,6 @@
 import {FC} from 'react'
-import {Navbar} from './'
+import {Navbar, Modal} from './'
+import {ModalProvider} from '../lib/ModalContext'
 import styled from 'styled-components'
 
 const PageContainer = styled.div`
@@ -16,7 +17,7 @@ type LayoutProps = {
 
 const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
   return (
-    <div>
+    <ModalProvider>
       <Navbar />
 
       <PageContainer className="px-8 pt-14 flex flex-row justify-center">
@@ -32,7 +33,9 @@ const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
 
         <div className="flex-1 h-full"></div>
       </PageContainer>
-    </div>
+          
+      <Modal />
+    </ModalProvider>
   )
 }
 

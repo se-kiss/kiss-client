@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import {FC} from 'react'
+import {FC, useContext} from 'react'
+import {ModalContext} from '../lib/ModalContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
@@ -36,13 +37,21 @@ const Button = styled.button`
   }
 `
 
+const PlaylistForm: FC = () => {
+  return null
+}
+
 const NavbarEnd: FC = () => {
   const isLogin = true
+  const {dispatch} = useContext(ModalContext)
 
   if (!isLogin) {
     return (
       <div className="flex flex-row items-center">
-        <LinkText className="text-lg font-medium mx-4 cursor-pointer">Login</LinkText>
+        <LinkText className="text-lg font-medium mx-4 cursor-pointer">
+          Login
+        </LinkText>
+
         <Button className="px-4 py-2 text-md font-medium rounded mx-4">
           Register
         </Button>
@@ -57,7 +66,10 @@ const NavbarEnd: FC = () => {
         <LinkText className="text-lg font-medium">User</LinkText>
       </div>
 
-      <IconButton className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer">
+      <IconButton
+        className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer"
+        onClick={() => dispatch({show: true, Content: PlaylistForm})}
+      >
         <FontAwesomeIcon icon={faPlus} className="text-lg font-medium" />
       </IconButton>
 
