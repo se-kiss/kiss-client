@@ -4,6 +4,12 @@ import {
   ModalContext,
   initialState as initialModalState,
 } from '../lib/ModalContext'
+import {
+  PlaylistFormProvider,
+  PlaylistFormContext,
+  PlaylistFormMode,
+  initialState as initialPlaylistFormState
+} from '../lib/PlaylistFormContext'
 import styled from 'styled-components'
 
 const Button = styled.button`
@@ -19,17 +25,25 @@ const LinkText = styled.h4`
   color: #626aaa;
 `
 
-const PlaylistForm: FC = () => {
+const Form: FC = () => {
   const router = useRouter()
-  const {dispatch} = useContext(ModalContext)
+  const {dispatch: dispatchModal} = useContext(ModalContext)
+  const {state: playlistFormState, dispatch: dispatchPlaylistForm} = useContext(PlaylistFormContext)
 
   const onSubmit = () => {
-    router.push('/playlists/id')
+    router.push(`/playlists/${1}/media`)
+    dispatchModal({...initialModalState})
+    dispatchPlaylistForm({...initialPlaylistFormState})
   }
+
+  console.log(playlistFormState.mode)
 
   return (
     <div className="px-8 py-2">
-      <h1 className="text-2xl font-bold">Create Playlist</h1>
+      <h1 className="text-2xl font-bold">
+        {playlistFormState.mode === PlaylistFormMode.Create ? 'Create ': 'Edit '}
+        Playlist
+      </h1>
 
       <div className="mt-8">
         <h2 className="text-md font-semibold mb-1">Title</h2>
@@ -51,7 +65,7 @@ const PlaylistForm: FC = () => {
       <div className="flex flex-row justify-center items-center mt-8">
         <LinkText
           className="text-md font-medium mx-6 cursor-pointer"
-          onClick={() => dispatch({...initialModalState})}
+          onClick={() => dispatchModal({...initialModalState})}
         >
           Cancel
         </LinkText>
@@ -60,10 +74,18 @@ const PlaylistForm: FC = () => {
           className="rounded px-4 py-1 text-xl font-medium mx-6"
           onClick={onSubmit}
         >
-          Create
+          {playlistFormState.mode === PlaylistFormMode.Create ? 'Create': 'Update'}
         </Button>
       </div>
     </div>
+  )
+}
+
+const PlaylistForm: FC = () => {
+  return (
+  <PlaylistFormProvider>
+    <Form />
+  </PlaylistFormProvider>
   )
 }
 
