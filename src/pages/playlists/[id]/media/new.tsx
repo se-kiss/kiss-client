@@ -128,9 +128,9 @@ const TagField: FC = () => {
     <div className="my-12">
       <h2 className="text-md font-semibold mb-4">Tags</h2>
 
-      <select multiple size={5} className="w-1/3 h-8 shadow mb-4">
+      <select multiple size={5} className="w-1/3 h-20 shadow mb-4">
         {tags.map(({name}) => (
-          <option key={name}>{name}</option>
+          <option key={name} className="text-md font-medium py-4 pl-2">{name}</option>
         ))}
       </select>
 
