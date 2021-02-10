@@ -7,6 +7,9 @@ export enum MediaTypes {
 
 interface MediaFormState {
   mediaType: MediaTypes
+  title: string
+  content?: any
+  description?: string
 }
 
 interface IMediaFormContext {
@@ -16,6 +19,9 @@ interface IMediaFormContext {
 
 export const initialState = {
   mediaType: MediaTypes.Article,
+  title: '',
+  content: null,
+  description: '',
 }
 
 export const MediaFormContext = createContext<IMediaFormContext>({

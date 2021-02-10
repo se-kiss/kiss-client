@@ -15,6 +15,10 @@ type MediaTypeProps = {
   active?: boolean
 }
 
+type TagProps = {
+  color?: string
+}
+
 const MediaType = styled.div<MediaTypeProps>`
   ${({active}) =>
     active
@@ -48,6 +52,11 @@ const Button = styled.button`
   }
 `
 
+const Tag = styled.div<TagProps>`
+  background: ${({color}) => (color ? color : 'white')};
+  color: white;
+`
+
 const SideBox: FC = () => {
   const {state, dispatch} = useContext(MediaFormContext)
 
@@ -74,7 +83,13 @@ const SideBox: FC = () => {
             key={type}
             className="flex flex-row items-center rounded my-2 py-2 pl-2 cursor-pointer"
             active={type === state.mediaType}
-            onClick={() => dispatch({...initialMediaState, mediaType: type})}
+            onClick={() =>
+              dispatch({
+                ...initialMediaState,
+                mediaType: type,
+                title: state.title,
+              })
+            }
           >
             <FontAwesomeIcon icon={icon} className="mr-4" />
             <h4 className="text-lg font-medium">{name}</h4>
@@ -93,14 +108,70 @@ const SideBox: FC = () => {
   )
 }
 
+const TagField: FC = () => {
+  const tags = [
+    {
+      name: 'Science',
+      color: '#ff4090',
+    },
+    {
+      name: 'Art',
+      color: '#9fb4ff',
+    },
+    {
+      name: 'Math',
+      color: '#fbe1ff',
+    },
+  ]
+
+  return (
+    <div className="my-12">
+      <h2 className="text-md font-semibold mb-4">Tags</h2>
+
+      <select multiple size={5} className="w-1/3 h-8 shadow mb-4">
+        {tags.map(({name}) => (
+          <option key={name}>{name}</option>
+        ))}
+      </select>
+
+      <div className="flex flex-row flex-wrap">
+        {tags.map(({name, color}) => (
+          <Tag
+            key={name}
+            color={color}
+            className="rounded p-1 mr-2 mb-2 font-bold"
+          >
+            {name}
+          </Tag>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const ArticleForm: FC = () => {
+  const {state, dispatch} = useContext(MediaFormContext)
+
   return (
     <div className="w-full h-full px-10 py-10">
-      <div>
+      <div className="mb-6">
         <h2 className="text-md font-semibold mb-1">Title</h2>
         <input
           className="w-full text-xl rounded-sm shadow-lg py-2 pl-4"
           placeholder="Title"
+          name="title"
+          value={state.title}
+          onChange={(e) => dispatch({[e.target.name]: e.target.value})}
+        />
+      </div>
+
+      <TagField />
+
+      <div className="my-12">
+      <h2 className="text-md font-semibold mb-1">Content</h2>
+        <textarea
+          className="w-full h-60 text-xl rounded-sm shadow-lg py-2 pl-4 resize-none overflow-hidden"
+          placeholder="Content"
         />
       </div>
     </div>
@@ -108,6 +179,7 @@ const ArticleForm: FC = () => {
 }
 
 const VideoForm: FC = () => {
+  const {state, dispatch} = useContext(MediaFormContext)
   const videoInput = useRef(null)
 
   const onUploadClick = () => {
@@ -138,13 +210,18 @@ const VideoForm: FC = () => {
           <input
             className="w-full text-xl rounded-sm shadow-lg py-2 pl-4"
             placeholder="Title"
+            name="title"
+            value={state.title}
+            onChange={(e) => dispatch({[e.target.name]: e.target.value})}
           />
         </div>
 
+        <TagField />
+
         <div className="mt-8">
           <h2 className="text-md font-semibold mb-1">Description</h2>
-          <input
-            className="w-full text-xl rounded-sm shadow-lg py-2 pl-4"
+          <textarea
+            className="w-full h-24 text-xl rounded-sm shadow-lg py-2 pl-4 resize-none overflow-hidden"
             placeholder="Description"
           />
         </div>
