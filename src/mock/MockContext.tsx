@@ -15,6 +15,9 @@ type MockState = {
   tags: TagType[]
   media: MediaType[]
   users: UserType[]
+  search: {
+    tagIds: string[]
+  }
 }
 
 const initialState: MockState = {
@@ -22,9 +25,15 @@ const initialState: MockState = {
   tags,
   media,
   users,
+  search: {
+    tagIds: [],
+  },
 }
 
-export enum ActionTypes {}
+export enum ActionTypes {
+  AddSearchTag = 'ADD_SEARCH_TAG',
+  RemoveSearchTag = 'REMOVE_SEARCH_TAG',
+}
 
 type ActionType = {
   type: ActionTypes
@@ -32,7 +41,28 @@ type ActionType = {
 }
 
 const reducer: Reducer<MockState, ActionType> = (state, action) => {
+  const {search} = state
   switch (action.type) {
+    case ActionTypes.AddSearchTag:
+      return {
+        ...state,
+        search: {
+          ...search,
+          tagIds: search.tagIds.includes(action.payload.tagId)
+            ? search.tagIds
+            : [...search.tagIds, action.payload.tagId],
+        },
+      }
+
+    case ActionTypes.RemoveSearchTag:
+      return {
+        ...state,
+        search: {
+          ...search,
+          tagIds: search.tagIds.filter((tagId) => tagId !== action.payload.tagId)
+        },
+      }
+
     default:
       return state
   }

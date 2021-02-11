@@ -3,7 +3,7 @@ import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
 import {Layout} from '../../../components'
 import {PlaylistType} from '../../../mock/data'
-import {MockContext} from '../../../mock/MockContext'
+import {ActionTypes, MockContext} from '../../../mock/MockContext'
 import styled from 'styled-components'
 
 type TagProps = {
@@ -11,12 +11,64 @@ type TagProps = {
 }
 
 const Tag = styled.div<TagProps>`
-  background: ${({color}) => (color ? color : 'white')};
+    border-color: ${({color}) => color};
+    border-width: 2px;
+
+  ${({color}) => (color ? `
+    background: ${color};
+  ` : `
+    background: white;
+  `)}
 `
 
 const Card = styled.div`
   color: #626aaa;
 `
+
+const SideBox: FC = () => {
+  const {state, dispatch} = useContext(MockContext)
+  const {tags, search} = state
+
+  return (
+    <div className="p-4">
+      <input
+        type="text"
+        className="w-full py-1 pl-2 rounded shadow"
+        placeholder="Search"
+      />
+
+      <div className="mt-4">
+        <h2 className="text-md font-medium">Tags</h2>
+        <div className="w-full flex flex-row flex-wrap mt-2">
+          {tags.map(({id, name, color}) => (
+            <Tag
+              key={id}
+              color={search.tagIds.includes(id)? color : undefined}
+              className="rounded my-1 mr-2 px-2 text-black cursor-pointer"
+              onClick={() => {
+                !search.tagIds.includes(id)
+                  ? dispatch({
+                      type: ActionTypes.AddSearchTag,
+                      payload: {
+                        tagId: id,
+                      },
+                    })
+                  : dispatch({
+                      type: ActionTypes.RemoveSearchTag,
+                      payload: {
+                        tagId: id,
+                      },
+                    })
+              }}
+            >
+              {name}
+            </Tag>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 type PlaylistCardProps = {
   playlist: PlaylistType
@@ -38,7 +90,10 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
   }
 
   return (
-    <Card className="bg-white w-9/12 rounded-lg shadow-xl p-4 my-8 cursor-pointer" onClick={onCardClick}>
+    <Card
+      className="bg-white w-9/12 rounded-lg shadow-xl p-4 my-8 cursor-pointer"
+      onClick={onCardClick}
+    >
       <div className="flex flex-row items-center">
         <div className="w-8 h-8 rounded-full bg-gray-500 mr-4" />
 
@@ -53,7 +108,11 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
 
         <div className="flex flex-row flex-wrap items-center mt-4">
           {tags.map(({id, name, color}) => (
-            <Tag key={id} color={color} className="rounded mr-2 px-2 text-black">
+            <Tag
+              key={id}
+              color={color}
+              className="rounded my-2 mr-2 px-2 text-black"
+            >
               {name}
             </Tag>
           ))}
@@ -65,12 +124,26 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
 
 const Playlists: NextPage = () => {
   const {state} = useContext(MockContext)
-  const {playlists} = state
-  console.log(state)
+  const {playlists, search} = state
+
+  // TODO: this is for demo
+  console.log(search)
+  const searchResults = []
+  search.tagIds.forEach((tagId) => {
+    const filtered = playlists.filter((playlist) => playlist.tagIds.includes(tagId))
+    filtered.forEach((playlist) => {
+      if (!searchResults.includes(playlist)) {
+        searchResults.push(playlist)
+      }
+    })
+  })
+
+  const results = search.tagIds.length !== 0 ? searchResults : playlists
+
   return (
-    <Layout>
+    <Layout SideComponent={SideBox}>
       <div className="px-10 mt-8 mx-auto">
-        {playlists.map((playlist) => (
+        {results.map((playlist) => (
           <PlaylistCard key={playlist.id} playlist={playlist} />
         ))}
       </div>
