@@ -2,8 +2,10 @@ import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
 import {Layout} from '../../../components'
-import {PlaylistType} from '../../../mock/data'
+import {PlaylistType, MediaTypes} from '../../../mock/data'
 import {ActionTypes, MockContext} from '../../../mock/MockContext'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
 type TagProps = {
@@ -11,14 +13,17 @@ type TagProps = {
 }
 
 const Tag = styled.div<TagProps>`
-    border-color: ${({color}) => color};
-    border-width: 2px;
+  border-color: ${({color}) => color};
+  border-width: 2px;
 
-  ${({color}) => (color ? `
+  ${({color}) =>
+    color
+      ? `
     background: ${color};
-  ` : `
+  `
+      : `
     background: white;
-  `)}
+  `}
 `
 
 const Card = styled.div`
@@ -43,7 +48,7 @@ const SideBox: FC = () => {
           {tags.map(({id, name, color}) => (
             <Tag
               key={id}
-              color={search.tagIds.includes(id)? color : undefined}
+              color={search.tagIds.includes(id) ? color : undefined}
               className="rounded my-1 mr-2 px-2 text-black cursor-pointer"
               onClick={() => {
                 !search.tagIds.includes(id)
@@ -77,13 +82,28 @@ type PlaylistCardProps = {
 const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
   const router = useRouter()
   const {state} = useContext(MockContext)
-  const {users, tags: mockTags} = state
+  const {users, tags: mockTags, media} = state
 
   const {id, name, ownerId, tagIds} = playlist
   const owner = users.find((user) => user.id === ownerId)
   const tags = tagIds.map((tagId) =>
     mockTags.find((mockTag) => mockTag.id === tagId)
   )
+
+  const types = media
+    .filter((mediaOne) => mediaOne.playlistId === id)
+    .map(({type}) => {
+      const icon = ((type) => {
+        switch (type) {
+          case MediaTypes.Article:
+            return faNewspaper
+          case MediaTypes.Video:
+            return faVideo
+        }
+      })(type)
+      
+      return {type, icon}
+    })
 
   const onCardClick = () => {
     router.push(`/demo/playlists/${id}/media`)
@@ -106,7 +126,15 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
       <div className="px-4 mt-2">
         <h1 className="text-xl font-semibold">{name}</h1>
 
-        <div className="flex flex-row flex-wrap items-center mt-4">
+        <div className="flex flex-row flex-wrap items-center">
+          {types.map(({type, icon}) => (
+            <div key={type} className="rounded my-2 mr-2 px-2">
+              <FontAwesomeIcon icon={icon} size="lg" />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-row flex-wrap items-center">
           {tags.map(({id, name, color}) => (
             <Tag
               key={id}
@@ -130,7 +158,9 @@ const Playlists: NextPage = () => {
   console.log(search)
   const searchResults = []
   search.tagIds.forEach((tagId) => {
-    const filtered = playlists.filter((playlist) => playlist.tagIds.includes(tagId))
+    const filtered = playlists.filter((playlist) =>
+      playlist.tagIds.includes(tagId)
+    )
     filtered.forEach((playlist) => {
       if (!searchResults.includes(playlist)) {
         searchResults.push(playlist)

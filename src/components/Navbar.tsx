@@ -5,6 +5,7 @@ import {ModalContext} from '../lib/ModalContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
+import { MockContext } from '../mock/MockContext'
 
 const Container = styled.div`
   background: #d8e6f3;
@@ -39,10 +40,13 @@ const Button = styled.button`
 `
 
 const NavbarEnd: FC = () => {
-  const isLogin = true
+  const {state} = useContext(MockContext)
+  const {users} = state
+  const user = users[0]
+
   const {dispatch} = useContext(ModalContext)
 
-  if (!isLogin) {
+  if (!user) {
     return (
       <div className="flex flex-row items-center">
         <LinkText className="text-lg font-medium mx-4 cursor-pointer">
@@ -60,7 +64,7 @@ const NavbarEnd: FC = () => {
     <div className="flex flex-row items-center">
       <div className="flex flex-row items-center mx-4 cursor-pointer">
         <div className="w-8 h-8 bg-white rounded-full mr-2" />
-        <LinkText className="text-lg font-medium">User</LinkText>
+        <LinkText className="text-lg font-medium">{user.name}</LinkText>
       </div>
 
       <IconButton

@@ -5,7 +5,8 @@ import {Layout} from '../../../../../components'
 import {MockContext} from '../../../../../mock/MockContext'
 import {MediaType, MediaTypes} from '../../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faNewspaper, faVideo, faPlus} from '@fortawesome/free-solid-svg-icons'
+import {faComment, faBookmark} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
 
 const Card = styled.div`
@@ -44,14 +45,14 @@ const SideBox: FC = () => {
           <Tag
             key={id}
             color={color}
-            className="rounded mr-1 px-1 text-black text-sm"
+            className="rounded mr-2 px-1 text-black text-sm"
           >
             {name}
           </Tag>
         ))}
       </div>
 
-      <p className="text-md font-normal mt-2">{description}</p>
+      <p className="text-md font-normal mt-4">{description}</p>
     </div>
   )
 }
@@ -99,8 +100,17 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
       <div className="px-4 mt-2">
         <h1 className="text-xl font-semibold">{name}</h1>
 
-        <div className="mt-4">
+        <div className="mt-2">
           <FontAwesomeIcon icon={typeIcon} size="lg" />
+        </div>
+
+        <div className="flex flex-row justify-between items-center mt-8">
+          <div className="flex flex-row items-center">
+            <FontAwesomeIcon icon={faPlus} className="mr-6" />
+            <FontAwesomeIcon icon={faComment} className="mr-6" />
+          </div>
+
+          <FontAwesomeIcon icon={faBookmark} />
         </div>
       </div>
     </Card>
