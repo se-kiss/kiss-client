@@ -111,7 +111,7 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
 
   return (
     <Card
-      className="bg-white w-9/12 rounded-lg shadow-xl p-4 my-8 cursor-pointer"
+      className="bg-white w-full rounded-lg shadow-xl p-4 my-8 cursor-pointer"
       onClick={onCardClick}
     >
       <div className="flex flex-row items-center">
