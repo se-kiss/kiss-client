@@ -1,9 +1,11 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout} from '../../../../components'
-import {MockContext} from '../../../../mock/MockContext'
-import {MediaType} from '../../../../mock/data'
+import {Layout} from '../../../../../components'
+import {MockContext} from '../../../../../mock/MockContext'
+import {MediaType, MediaTypes} from '../../../../../mock/data'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
 const Card = styled.div`
@@ -25,9 +27,13 @@ const SideBox: FC = () => {
   const router = useRouter()
   const {id} = router.query
 
-  const {name, description, tagIds} = playlists.find((playlist) => playlist.id === id)
+  const {name, description, tagIds} = playlists.find(
+    (playlist) => playlist.id === id
+  )
 
-  const tags = tagIds.map((tagId) => mockTags.find((mockTag) => mockTag.id === tagId))
+  const tags = tagIds.map((tagId) =>
+    mockTags.find((mockTag) => mockTag.id === tagId)
+  )
 
   return (
     <div className="p-4">
@@ -35,7 +41,11 @@ const SideBox: FC = () => {
 
       <div className="flex flex-row flex-wrap items-center mt-2">
         {tags.map(({id, name, color}) => (
-          <Tag key={id} color={color} className="rounded mr-1 px-1 text-black text-sm">
+          <Tag
+            key={id}
+            color={color}
+            className="rounded mr-1 px-1 text-black text-sm"
+          >
             {name}
           </Tag>
         ))}
@@ -52,14 +62,31 @@ type MediaCardProps = {
 
 const MediaCard: FC<MediaCardProps> = ({media}) => {
   const {state} = useContext(MockContext)
-  const {name, playlistId} = media
+  const {id, name, playlistId, type} = media
   const {playlists, users} = state
 
   const {ownerId} = playlists.find((playlist) => playlist.id === playlistId)
   const owner = users.find((user) => user.id === ownerId)
 
+  const typeIcon = ((type) => {
+    switch (type) {
+      case MediaTypes.Article:
+        return faNewspaper
+      case MediaTypes.Video:
+        return faVideo
+    }
+  })(type)
+
+  const router = useRouter()
+  const onCardClick = () => {
+    router.push(`/demo/playlists/${playlistId}/media/${id}`)
+  }
+
   return (
-    <Card className="bg-white w-9/12 rounded-lg shadow-xl p-4 my-8 cursor-pointer">
+    <Card
+      className="bg-white w-9/12 rounded-lg shadow-xl p-4 my-8 cursor-pointer"
+      onClick={onCardClick}
+    >
       <div className="flex flex-row items-center">
         <div className="w-8 h-8 rounded-full bg-gray-500 mr-4" />
 
@@ -71,6 +98,10 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
 
       <div className="px-4 mt-2">
         <h1 className="text-xl font-semibold">{name}</h1>
+
+        <div className="mt-4">
+          <FontAwesomeIcon icon={typeIcon} size="lg" />
+        </div>
       </div>
     </Card>
   )
