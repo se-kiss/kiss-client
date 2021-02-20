@@ -1,5 +1,5 @@
-import {FC, useContext} from 'react'
-import {ModalContext, initialState as initialModalState} from '../lib/ModalContext'
+import {FC} from 'react'
+import useModal, {ModalActionTypes} from '../lib/useModal'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTimes} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
@@ -20,7 +20,12 @@ const Container = styled.div`
 `
 
 const Card: FC = ({children}) => {
-  const {dispatch} = useContext(ModalContext)
+  const {dispatch} = useModal()
+  const onModalClose = () => {
+    dispatch({
+      type: ModalActionTypes.CloseModal
+    })
+  }
 
   return (
     <div className="relative w-full h-full">
@@ -30,7 +35,7 @@ const Card: FC = ({children}) => {
             <FontAwesomeIcon
               icon={faTimes}
               className="cursor-pointer mr-2 text-gray-500"
-              onClick={() => dispatch({...initialModalState})}
+              onClick={onModalClose}
             />
           </div>
           {children}
@@ -41,7 +46,7 @@ const Card: FC = ({children}) => {
 }
 
 const Modal: FC = () => {
-  const {state} = useContext(ModalContext)
+  const {state} = useModal()
   const {show, Content: ModalContent} = state
 
   if (!show) {

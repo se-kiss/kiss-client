@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {Navbar, Modal} from './'
-import {ModalProvider} from '../lib/ModalContext'
+import {ModalProvider} from '../lib/useModal'
 import styled from 'styled-components'
 
 const PageContainer = styled.div`
