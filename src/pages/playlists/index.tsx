@@ -1,9 +1,9 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout} from '../../../components'
-import {PlaylistType, MediaTypes} from '../../../mock/data'
-import {ActionTypes, MockContext} from '../../../mock/MockContext'
+import {Layout} from '../../components'
+import {PlaylistType, MediaTypes} from '../../mock/data'
+import {ActionTypes, MockContext} from '../../mock/MockContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
@@ -106,7 +106,7 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
     })
 
   const onCardClick = () => {
-    router.push(`/demo/playlists/${id}/media`)
+    router.push(`/playlists/${id}/media`)
   }
 
   return (

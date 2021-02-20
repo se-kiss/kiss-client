@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import {FC, useContext} from 'react'
-import {PlaylistForm} from './'
-import {ModalContext} from '../lib/ModalContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
-import { MockContext } from '../mock/MockContext'
+import {MockContext} from '../mock/MockContext'
 
 const Container = styled.div`
   background: #d8e6f3;
@@ -44,8 +42,6 @@ const NavbarEnd: FC = () => {
   const {users} = state
   const user = users[0]
 
-  const {dispatch} = useContext(ModalContext)
-
   if (!user) {
     return (
       <div className="flex flex-row items-center">
@@ -67,10 +63,7 @@ const NavbarEnd: FC = () => {
         <LinkText className="text-lg font-medium">{user.name}</LinkText>
       </div>
 
-      <IconButton
-        className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer"
-        onClick={() => dispatch({show: true, Content: PlaylistForm})}
-      >
+      <IconButton className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer">
         <FontAwesomeIcon icon={faPlus} className="text-lg font-medium" />
       </IconButton>
 
