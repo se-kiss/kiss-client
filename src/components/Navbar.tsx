@@ -2,6 +2,8 @@ import Link from 'next/link'
 import {FC, useContext} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
+import useModal, {ModalActionTypes} from '../lib/useModal'
+import {PlaylistForm} from '../components'
 import styled from 'styled-components'
 import {MockContext} from '../mock/MockContext'
 
@@ -38,9 +40,19 @@ const Button = styled.button`
 `
 
 const NavbarEnd: FC = () => {
+  const {dispatch: dispatchModal} = useModal()
   const {state} = useContext(MockContext)
   const {users} = state
   const user = users[0]
+
+  const onPlaylistAddClick = () => {
+    dispatchModal({
+      type: ModalActionTypes.ShowModal,
+      payload: {
+        Content: PlaylistForm,
+      },
+    })
+  }
 
   if (!user) {
     return (
@@ -63,7 +75,10 @@ const NavbarEnd: FC = () => {
         <LinkText className="text-lg font-medium">{user.name}</LinkText>
       </div>
 
-      <IconButton className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer">
+      <IconButton
+        className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer"
+        onClick={onPlaylistAddClick}
+      >
         <FontAwesomeIcon icon={faPlus} className="text-lg font-medium" />
       </IconButton>
 

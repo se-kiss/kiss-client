@@ -132,7 +132,7 @@ const Media: NextPage = () => {
 
   return (
     <Layout SideComponent={SideBox}>
-      <div className="h0px-10 mt-8 flex flex-row justify-center">
+      <div className="px-10 mt-8 flex flex-row justify-center">
         <MediaComponent media={media} />
       </div>
     </Layout>
