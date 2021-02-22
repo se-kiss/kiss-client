@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import {FC, useContext} from 'react'
-import {PlaylistForm} from './'
-import {ModalContext} from '../lib/ModalContext'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
+import useModal, {ModalActionTypes} from '../lib/useModal'
+import {PlaylistForm} from '../components'
 import styled from 'styled-components'
+import {MockContext} from '../mock/MockContext'
 
 const Container = styled.div`
   background: #d8e6f3;
@@ -39,10 +40,21 @@ const Button = styled.button`
 `
 
 const NavbarEnd: FC = () => {
-  const isLogin = true
-  const {dispatch} = useContext(ModalContext)
+  const {dispatch: dispatchModal} = useModal()
+  const {state} = useContext(MockContext)
+  const {users} = state
+  const user = users[0]
 
-  if (!isLogin) {
+  const onPlaylistAddClick = () => {
+    dispatchModal({
+      type: ModalActionTypes.ShowModal,
+      payload: {
+        Content: PlaylistForm,
+      },
+    })
+  }
+
+  if (!user) {
     return (
       <div className="flex flex-row items-center">
         <LinkText className="text-lg font-medium mx-4 cursor-pointer">
@@ -60,12 +72,12 @@ const NavbarEnd: FC = () => {
     <div className="flex flex-row items-center">
       <div className="flex flex-row items-center mx-4 cursor-pointer">
         <div className="w-8 h-8 bg-white rounded-full mr-2" />
-        <LinkText className="text-lg font-medium">User</LinkText>
+        <LinkText className="text-lg font-medium">{user.name}</LinkText>
       </div>
 
       <IconButton
         className="w-10 h-10 shadow rounded-full mx-4 flex justify-center items-center cursor-pointer"
-        onClick={() => dispatch({show: true, Content: PlaylistForm})}
+        onClick={onPlaylistAddClick}
       >
         <FontAwesomeIcon icon={faPlus} className="text-lg font-medium" />
       </IconButton>

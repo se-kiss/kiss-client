@@ -1,4 +1,4 @@
-import {NextPage} from 'next'
+import {GetServerSideProps, NextPage} from 'next'
 import {Layout} from '../components'
 
 const Home: NextPage = () => {
@@ -10,3 +10,12 @@ const Home: NextPage = () => {
 }
 
 export default Home
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {},
+    redirect: {
+      destination: '/playlists'
+    }
+  }
+}
