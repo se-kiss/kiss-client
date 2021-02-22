@@ -24,7 +24,7 @@ const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
       <PageContainer className="px-8 pt-14 flex flex-row justify-center">
         <div className="flex-1 h-full flex flex-row justify-center pt-8">
           {SideComponent && (
-            <div className="w-auto lg:w-60 h-auto bg-white fixed rounded-lg shadow-lg mx-auto">
+            <div className="w-auto lg:w-60 h-auto bg-white fixed rounded-lg shadow-lg">
               <SideComponent />
             </div>
           )}

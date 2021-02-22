@@ -3,7 +3,7 @@ import {FC, useContext} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import useModal, {ModalActionTypes} from '../lib/useModal'
-import {PlaylistForm} from '../components'
+import {PlaylistForm} from '../components/Playlist'
 import styled from 'styled-components'
 import {MockContext} from '../mock/MockContext'
 
