@@ -11,17 +11,7 @@ type TagProps = {
 }
 
 const Tag = styled.div<TagProps>`
-  border-color: ${({color}) => color};
-  border-width: 2px;
-
-  ${({color}) =>
-    color
-      ? `
-    background: ${color};
-  `
-      : `
-    background: white;
-  `}
+  background: ${({color}) => (color ? color : 'white')};
 `
 
 type PlaylistCardProps = {
@@ -80,7 +70,7 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
             <Tag
               key={id}
               color={color}
-              className="rounded my-2 mr-2 px-2 text-gray-700 text-xs font-medium"
+              className="rounded my-2 mr-2 px-2 py-1 text-gray-700 text-xs font-medium"
             >
               {name}
             </Tag>
