@@ -1,7 +1,7 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout} from '../../../../components'
+import {Layout, HorizontalLine} from '../../../../components'
 import {MockContext} from '../../../../mock/MockContext'
 import {MediaTypes, MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -16,11 +16,6 @@ const Button = styled.button`
   &:focus {
     outline: none;
   }
-`
-
-const HorizontalLine = styled.hr`
-  border-color: #ED827B;
-  border-top-width: 1px;
 `
 
 const MenuButton = styled.div`
@@ -71,7 +66,7 @@ const SideBox: FC = () => {
         </div>
       </div>
 
-      <HorizontalLine className="w-full my-4" />
+      <HorizontalLine className="my-4" />
 
       <div>
         {menuButtons.map(({name, icon}) => (
