@@ -52,7 +52,7 @@ const Form: FC = () => {
           name="name"
           value={formState.name}
           onChange={(e) => dispatchForm({[e.target.name]: e.target.value})}
-          className="w-full border border-gray-400 pl-2 py-1 text-lg rounded focus:outline-none"
+          className="w-full border border-gray-300 pl-2 py-1 text-lg rounded focus:outline-none"
         />
       </div>
 
@@ -63,7 +63,7 @@ const Form: FC = () => {
           onChange={(e) => dispatchForm({[e.target.name]: e.target.value})}
           value={formState.description}
           rows={4}
-          className="w-full border border-gray-400 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
+          className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
         />
       </div>
 

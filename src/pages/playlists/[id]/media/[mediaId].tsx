@@ -90,7 +90,7 @@ type MediaComponentProps = {
 const Article: FC<MediaComponentProps> = ({media}) => {
   const {name, content} = media
   return (
-    <div className="bg-white w-9/12 h-auto px-10 pt-6 pb-20 rounded-xl shadow-xl">
+    <div className="bg-white w-10/12 h-auto px-10 pt-6 pb-20 rounded-xl shadow-xl">
       <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
       <p className="text-lg text-gray-700 font-normal mt-4">{content}</p>
     </div>
@@ -100,7 +100,7 @@ const Article: FC<MediaComponentProps> = ({media}) => {
 const Video: FC<MediaComponentProps> = ({media}) => {
   const {name, description, url} = media
   return (
-    <div className="bg-white w-9/12 h-auto rounded-xl shadow-xl">
+    <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
       <iframe src={url} className="w-full h-80 rounded-t-xl" />
       <div className="px-10 pt-4 pb-8">
         <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>

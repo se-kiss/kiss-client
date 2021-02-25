@@ -1,12 +1,21 @@
-import {createContext, useReducer, useContext, Dispatch, FC, Reducer} from 'react'
+import {
+  createContext,
+  useReducer,
+  useContext,
+  Dispatch,
+  FC,
+  Reducer,
+} from 'react'
 import {MediaTypes} from '../mock/data'
 
 type MediaFormState = {
   type: MediaTypes
+  name: string
 }
 
 const initialState: MediaFormState = {
   type: MediaTypes.Article,
+  name: '',
 }
 
 const reducer: Reducer<MediaFormState, Partial<MediaFormState>> = (
@@ -21,7 +30,7 @@ const reducer: Reducer<MediaFormState, Partial<MediaFormState>> = (
 
 interface IMediaContext {
   state: MediaFormState
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<Partial<MediaFormState>>
 }
 
 const MediaFormContext = createContext<IMediaContext>({
