@@ -55,7 +55,7 @@ const Modal: FC = () => {
   }
 
   return (
-    <div className="absolute top-0 left-0 w-screen h-screen">
+    <div className="fixed z-20 top-0 left-0 w-screen h-screen">
       <Background />
       <Card>
         <ModalContent />

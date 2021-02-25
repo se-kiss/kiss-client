@@ -2,9 +2,12 @@ import {NextPage} from 'next'
 import {FC, useContext} from 'react'
 import {Layout} from '../../../../components'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faTimes, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
-import useMediaForm, {MediaFormProvider} from '../../../../lib/useMediaForm'
+import useMediaForm, {
+  MediaFormActionTypes,
+  MediaFormProvider,
+} from '../../../../lib/useMediaForm'
 import {MediaTypes} from '../../../../mock/data'
 import {MockContext} from '../../../../mock/MockContext'
 import styled from 'styled-components'
@@ -67,7 +70,14 @@ const SideBox: FC = () => {
           <TypeButton
             key={name}
             active={formState.type === type}
-            onClick={() => dispatchForm({type})}
+            onClick={() =>
+              dispatchForm({
+                type: MediaFormActionTypes.EditType,
+                payload: {
+                  type,
+                },
+              })
+            }
             className="rounded p-2 cursor-pointer flex flex-row items-center"
           >
             <FontAwesomeIcon icon={icon} />
@@ -83,17 +93,66 @@ const ArticleForm: FC = () => {
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {state: mockState} = useContext(MockContext)
   const {tags} = mockState
+  const {paragraph, paragraphIndex} = formState
+
+  const onEditName = (name) => {
+    dispatchForm({
+      type: MediaFormActionTypes.EditName,
+      payload: {
+        name,
+      },
+    })
+  }
+
+  const onAddParagraph = () => {
+    dispatchForm({
+      type: MediaFormActionTypes.AddParagraph,
+    })
+  }
+
+  const onEditParagraph = (text, index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.EditParagraph,
+      payload: {
+        paragraph: {
+          index,
+          text,
+        },
+      },
+    })
+  }
+
+  const onRemoveParagraph = (index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.RemoveParagraph,
+      payload: {
+        paragraph: {
+          index,
+        },
+      },
+    })
+  }
+
+  const onFocusParagraph = (index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.FocusParagraph,
+      payload: {
+        paragraph: {
+          index,
+        },
+      },
+    })
+  }
 
   return (
     <div>
       <div>
         <h3 className="text-md text-gray-700 font-medium mb-2">Name</h3>
         <input
-          name="name"
           type="text"
           className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
           value={formState.name}
-          onChange={(e) => dispatchForm({[e.target.name]: e.target.value})}
+          onChange={(e) => onEditName(e.target.value)}
         />
       </div>
 
@@ -115,13 +174,38 @@ const ArticleForm: FC = () => {
 
       <div className="mt-8">
         <h3 className="text-md text-gray-700 font-medium mb-2">Content</h3>
-        <textarea
-          rows={8}
-          className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
-        />
+        {paragraph.map((text, index) => (
+          <div key={`paragraph-${index}`} className="relative my-2 pt-2 pr-1">
+            <textarea
+              rows={8}
+              className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
+              value={text}
+              onChange={(e) => onEditParagraph(e.target.value, index)}
+              onFocus={() => onFocusParagraph(index)}
+            />
+
+            {index !== 0 && paragraphIndex === index && (
+              <OutlinedButton
+                className="absolute w-4 h-4 bg-white top-0 right-0 flex justify-center items-center rounded-full focus:outline-none"
+                onClick={() => onRemoveParagraph(index)}
+              >
+                <FontAwesomeIcon icon={faTimes} size="xs" />
+              </OutlinedButton>
+            )}
+          </div>
+        ))}
+
+        <div className="mt-4">
+          <OutlinedButton
+            className="w-8 h-8 rounded-full focus:outline-none"
+            onClick={onAddParagraph}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </OutlinedButton>
+        </div>
       </div>
 
-      <div className="mt-8 flex flex-row justify-around">
+      <div className="mt-16 flex flex-row justify-around">
         <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
           Cancel
         </OutlinedButton>

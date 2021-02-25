@@ -82,7 +82,7 @@ const NavbarEnd: FC = () => {
 
 const Navbar: FC = () => {
   return (
-    <Container className="fixed w-full h-16 bg-gray-200 px-12 flex flex-row  justify-between items-center shadow">
+    <Container className="fixed z-10 w-full h-16 bg-gray-200 px-12 flex flex-row  justify-between items-center shadow">
       <Link href="/">
         <h1 className="text-xl text-white font-semibold cursor-pointer">
           KiSS
