@@ -1,16 +1,16 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout} from '../../../../../components'
-import {MockContext} from '../../../../../mock/MockContext'
-import {MediaTypes, MediaType} from '../../../../../mock/data'
+import {Layout, HorizontalLine} from '../../../../components'
+import {MockContext} from '../../../../mock/MockContext'
+import {MediaTypes, MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faArrowUp, faArrowDown} from '@fortawesome/free-solid-svg-icons'
 import {faComment, faBookmark} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
 
 const Button = styled.button`
-  background: #626aaa;
+  background: #ED827B;
   color: white;
 
   &:focus {
@@ -18,17 +18,12 @@ const Button = styled.button`
   }
 `
 
-const HorizontalLine = styled.hr`
-  border-color: #626aaa;
-  border-top-width: 1px;
-`
-
 const MenuButton = styled.div`
   background: white;
-  color: #626aaa;
+  color: #ED827B;
 
   &:hover {
-    background: #626aaa;
+    background: #ED827B;
     color: white;
   }
 `
@@ -62,16 +57,16 @@ const SideBox: FC = () => {
   ]
 
   return (
-    <div className="p-4">
+    <div className="px-4 py-6">
       <div className="flex flex-row items-start">
-        <div className="w-8 h-8 rounded-full bg-gray-500 mr-4" />
+        <div className="w-7 h-7 rounded-full bg-red-400 mr-4" />
         <div>
-          <h4 className="text-lg font-medium">{owner.name}</h4>
-          <Button className="px-4 rounded text-sm">Follow</Button>
+          <h4 className="text-lg text-gray-700 font-medium">{owner.name}</h4>
+          <Button className="px-4 rounded text-sm font-medium">Follow</Button>
         </div>
       </div>
 
-      <HorizontalLine className="w-full my-4" />
+      <HorizontalLine className="my-4" />
 
       <div>
         {menuButtons.map(({name, icon}) => (
@@ -79,8 +74,8 @@ const SideBox: FC = () => {
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
           >
-            <FontAwesomeIcon icon={icon} size="lg" />
-            <span className="text-lg font-medium ml-4">{name}</span>
+            <FontAwesomeIcon icon={icon} />
+            <span className="text-md font-medium ml-4">{name}</span>
           </MenuButton>
         ))}
       </div>
@@ -95,9 +90,9 @@ type MediaComponentProps = {
 const Article: FC<MediaComponentProps> = ({media}) => {
   const {name, content} = media
   return (
-    <div className="bg-white w-9/12 h-auto px-10 py-4 rounded-xl shadow-xl">
-      <h1 className="text-3xl font-semibold">{name}</h1>
-      <p className="text-lg mt-8">{content}</p>
+    <div className="bg-white w-10/12 h-auto px-10 pt-6 pb-20 rounded-xl shadow-xl">
+      <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
+      <p className="text-lg text-gray-700 font-normal mt-4">{content}</p>
     </div>
   )
 }
@@ -105,11 +100,11 @@ const Article: FC<MediaComponentProps> = ({media}) => {
 const Video: FC<MediaComponentProps> = ({media}) => {
   const {name, description, url} = media
   return (
-    <div className="bg-white w-9/12 h-auto rounded-xl shadow-xl">
+    <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
       <iframe src={url} className="w-full h-80 rounded-t-xl" />
-      <div className="px-10 py-4">
-        <h1 className="text-3xl font-semibold">{name}</h1>
-        <p className="text-lg mt-4">{description}</p>
+      <div className="px-10 pt-4 pb-8">
+        <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
+        <p className="text-md text-gray-700 font-normal mt-2">{description}</p>
       </div>
     </div>
   )
@@ -132,7 +127,7 @@ const Media: NextPage = () => {
 
   return (
     <Layout SideComponent={SideBox}>
-      <div className="h0px-10 mt-8 flex flex-row justify-center">
+      <div className="px-10 mt-8 mx-auto flex flex-row justify-center">
         <MediaComponent media={media} />
       </div>
     </Layout>

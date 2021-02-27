@@ -1,142 +1,88 @@
 import {NextPage} from 'next'
-import {FC, useContext, useRef} from 'react'
+import {FC, useContext} from 'react'
+import {Layout} from '../../../../components'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faNewspaper, faVideo, faUpload} from '@fortawesome/free-solid-svg-icons'
-import {Layout, HorizontalLine} from '../../../../components'
-import {
+import {faPlus, faTimes, faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
+import useMediaForm, {
+  MediaFormActionTypes,
   MediaFormProvider,
-  MediaFormContext,
-  MediaTypes,
-  initialState as initialMediaState,
-} from '../../../../lib/MediaFormContext'
+} from '../../../../lib/useMediaForm'
+import {MediaTypes} from '../../../../mock/data'
+import {MockContext} from '../../../../mock/MockContext'
 import styled from 'styled-components'
 
-type MediaTypeProps = {
+type TypeButtonProp = {
   active?: boolean
 }
+
+const TypeButton = styled.div<TypeButtonProp>`
+  background: ${({active}) => (active ? '#ED827B' : 'white')};
+  color: ${({active}) => (active ? 'white' : '#ED827B')};
+
+  &:hover {
+    background: #ed827b;
+    color: white;
+  }
+`
 
 type TagProps = {
   color?: string
 }
 
-const MediaType = styled.div<MediaTypeProps>`
-  ${({active}) =>
-    active
-      ? `
-    color: white;
-    background: #626aaa;
-  `
-      : `
-    color: #626aaa;
-    background: white;
-  `}
+const Tag = styled.div<TagProps>`
+  border-color ${({color}) => (color ? color : 'lightgray')};
+  background: ${({color}) => (color ? color : 'white')};
+`
+
+const OutlinedButton = styled.button`
+  border: 1px solid #ff8a83;
+  color: #ff8a83;
 
   &:hover {
     color: white;
-    background: #626aaa;
+    background: #ff8a83;
   }
-`
-
-const Button = styled.button`
-  background: #267dcd;
-  color: white;
-
-  &:focus {
-    outline: none;
-  }
-`
-
-const Tag = styled.div<TagProps>`
-  background: ${({color}) => (color ? color : 'white')};
-  color: white;
 `
 
 const SideBox: FC = () => {
-  const {state, dispatch} = useContext(MediaFormContext)
-
-  const mediaTypes = [
+  const typeButtons = [
     {
+      type: MediaTypes.Article,
       name: 'Article',
       icon: faNewspaper,
-      type: MediaTypes.Article,
     },
     {
+      type: MediaTypes.Video,
       name: 'Video',
       icon: faVideo,
-      type: MediaTypes.Video,
     },
   ]
 
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
+
   return (
-    <div className="p-4">
-      <h1 className="text-lg font-bold">Select Media Type</h1>
+    <div className="px-4 py-6">
+      <h1 className="text-xl text-gray-700 font-bold">Select Media Type</h1>
 
       <div className="mt-4">
-        {mediaTypes.map(({name, icon, type}) => (
-          <MediaType
-            key={type}
-            className="flex flex-row items-center rounded my-2 py-2 pl-2 cursor-pointer"
-            active={type === state.mediaType}
+        {typeButtons.map(({type, name, icon}) => (
+          <TypeButton
+            key={name}
+            active={formState.type === type}
             onClick={() =>
-              dispatch({
-                ...initialMediaState,
-                mediaType: type,
-                title: state.title,
+              dispatchForm({
+                type: MediaFormActionTypes.EditType,
+                payload: {
+                  type,
+                },
               })
             }
+            className="rounded p-2 cursor-pointer flex flex-row items-center"
           >
-            <FontAwesomeIcon icon={icon} className="mr-4" />
-            <h4 className="text-lg font-medium">{name}</h4>
-          </MediaType>
-        ))}
-      </div>
-
-      <HorizontalLine className="my-4" />
-
-      <div>
-        <Button className="w-full rounded text-xl font-medium my-1 py-1">
-          Create
-        </Button>
-      </div>
-    </div>
-  )
-}
-
-const TagField: FC = () => {
-  const tags = [
-    {
-      name: 'Science',
-      color: '#ff4090',
-    },
-    {
-      name: 'Art',
-      color: '#9fb4ff',
-    },
-    {
-      name: 'Math',
-      color: '#fbe1ff',
-    },
-  ]
-
-  return (
-    <div className="my-12">
-      <h2 className="text-md font-semibold mb-4">Tags</h2>
-
-      <select multiple size={5} className="w-1/3 h-20 shadow mb-4">
-        {tags.map(({name}) => (
-          <option key={name} className="text-md font-medium py-4 pl-2">{name}</option>
-        ))}
-      </select>
-
-      <div className="flex flex-row flex-wrap">
-        {tags.map(({name, color}) => (
-          <Tag
-            key={name}
-            color={color}
-            className="rounded p-1 mr-2 mb-2 font-bold"
-          >
-            {name}
-          </Tag>
+            <FontAwesomeIcon icon={icon} />
+            <span className="text-md font-medium ml-4">{name}</span>
+          </TypeButton>
         ))}
       </div>
     </div>
@@ -144,94 +90,142 @@ const TagField: FC = () => {
 }
 
 const ArticleForm: FC = () => {
-  const {state, dispatch} = useContext(MediaFormContext)
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
+  const {state: mockState} = useContext(MockContext)
+  const {tags} = mockState
+  const {paragraph, paragraphIndex} = formState
 
-  return (
-    <div className="w-full h-full px-10 py-10">
-      <div className="mb-6">
-        <h2 className="text-md font-semibold mb-1">Title</h2>
-        <input
-          className="w-full text-xl rounded-sm shadow-lg py-2 pl-4"
-          placeholder="Title"
-          name="title"
-          value={state.title}
-          onChange={(e) => dispatch({[e.target.name]: e.target.value})}
-        />
-      </div>
+  const onEditName = (name) => {
+    dispatchForm({
+      type: MediaFormActionTypes.EditName,
+      payload: {
+        name,
+      },
+    })
+  }
 
-      <TagField />
+  const onAddParagraph = () => {
+    dispatchForm({
+      type: MediaFormActionTypes.AddParagraph,
+    })
+  }
 
-      <div className="my-12">
-      <h2 className="text-md font-semibold mb-1">Content</h2>
-        <textarea
-          className="w-full h-60 text-xl rounded-sm shadow-lg py-2 pl-4 resize-none overflow-hidden"
-          placeholder="Content"
-        />
-      </div>
-    </div>
-  )
-}
+  const onEditParagraph = (text, index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.EditParagraph,
+      payload: {
+        paragraph: {
+          index,
+          text,
+        },
+      },
+    })
+  }
 
-const VideoForm: FC = () => {
-  const {state, dispatch} = useContext(MediaFormContext)
-  const videoInput = useRef(null)
+  const onRemoveParagraph = (index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.RemoveParagraph,
+      payload: {
+        paragraph: {
+          index,
+        },
+      },
+    })
+  }
 
-  const onUploadClick = () => {
-    videoInput.current.click()
+  const onFocusParagraph = (index) => {
+    dispatchForm({
+      type: MediaFormActionTypes.FocusParagraph,
+      payload: {
+        paragraph: {
+          index,
+        },
+      },
+    })
   }
 
   return (
-    <div className="w-full h-full">
-      <div className="bg-black w-full h-80 flex justify-center items-center rounded-t">
-        <Button
-          className="rounded text-lg font-medium px-4 py-1"
-          onClick={onUploadClick}
-        >
-          <FontAwesomeIcon icon={faUpload} className="mr-2" />
-          <span>Upload</span>
-        </Button>
+    <div>
+      <div>
+        <h3 className="text-md text-gray-700 font-medium mb-2">Name</h3>
         <input
-          type="file"
-          accept="video/*"
-          ref={videoInput}
-          className="hidden"
+          type="text"
+          className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
+          value={formState.name}
+          onChange={(e) => onEditName(e.target.value)}
         />
       </div>
 
-      <div className="w-full h-full px-10 py-4">
-        <div>
-          <h2 className="text-md font-semibold mb-1">Title</h2>
-          <input
-            className="w-full text-xl rounded-sm shadow-lg py-2 pl-4"
-            placeholder="Title"
-            name="title"
-            value={state.title}
-            onChange={(e) => dispatch({[e.target.name]: e.target.value})}
-          />
-        </div>
+      <div className="mt-8">
+        <h3 className="text-md text-gray-700 font-medium mb-2">Tags</h3>
 
-        <TagField />
-
-        <div className="mt-8">
-          <h2 className="text-md font-semibold mb-1">Description</h2>
-          <textarea
-            className="w-full h-24 text-xl rounded-sm shadow-lg py-2 pl-4 resize-none overflow-hidden"
-            placeholder="Description"
-          />
+        <div className="w-full flex flex-row flex-wrap">
+          {tags.map(({id, name, color}) => (
+            <Tag
+              key={id}
+              color={color}
+              className="rounded my-1 mr-2 px-2 text-sm text-gray-700 font-medium border cursor-pointer"
+            >
+              {name}
+            </Tag>
+          ))}
         </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-md text-gray-700 font-medium mb-2">Content</h3>
+        {paragraph.map((text, index) => (
+          <div key={`paragraph-${index}`} className="relative my-2 pt-2 pr-1">
+            <textarea
+              rows={8}
+              className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
+              value={text}
+              onChange={(e) => onEditParagraph(e.target.value, index)}
+              onFocus={() => onFocusParagraph(index)}
+            />
+
+            {index !== 0 && paragraphIndex === index && (
+              <OutlinedButton
+                className="absolute w-4 h-4 bg-white top-0 right-0 flex justify-center items-center rounded-full focus:outline-none"
+                onClick={() => onRemoveParagraph(index)}
+              >
+                <FontAwesomeIcon icon={faTimes} size="xs" />
+              </OutlinedButton>
+            )}
+          </div>
+        ))}
+
+        <div className="mt-4">
+          <OutlinedButton
+            className="w-8 h-8 rounded-full focus:outline-none"
+            onClick={onAddParagraph}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </OutlinedButton>
+        </div>
+      </div>
+
+      <div className="mt-16 flex flex-row justify-around">
+        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
+          Cancel
+        </OutlinedButton>
+
+        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
+          Create
+        </OutlinedButton>
       </div>
     </div>
   )
 }
 
 const Form: FC = () => {
-  const {state} = useContext(MediaFormContext)
+  const {state: formState} = useMediaForm()
 
-  switch (state.mediaType) {
+  switch (formState.type) {
     case MediaTypes.Article:
       return <ArticleForm />
     case MediaTypes.Video:
-      return <VideoForm />
+      return null
     default:
       return null
   }
@@ -241,7 +235,7 @@ const MediaForm: NextPage = () => {
   return (
     <MediaFormProvider>
       <Layout SideComponent={SideBox}>
-        <div className="bg-white w-10/12 h-full mx-auto mt-2 rounded shadow">
+        <div className="w-10/12 px-10 py-6 mt-8 mx-auto bg-white rounded-xl shadow-xl">
           <Form />
         </div>
       </Layout>

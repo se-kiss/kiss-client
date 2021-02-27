@@ -1,85 +1,88 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout, HorizontalLine, PlaylistForm} from '../../../../components'
-import {ModalContext} from '../../../../lib/ModalContext'
-import {
-  PlaylistFormContext,
-  PlaylistFormMode,
-} from '../../../../lib/PlaylistFormContext'
+import {Layout, HorizontalLine} from '../../../../components'
+import {MockContext} from '../../../../mock/MockContext'
+import {MediaCard} from '../../../../components/Media'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faEdit, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faPlus} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-type MenuItemProps = {
-  active?: boolean
+type TagProps = {
+  color?: string
 }
 
-const MenuItem = styled.div<MenuItemProps>`
-  ${({active}) =>
-    active
-      ? `
-    color: white;
-    background: #626aaa;
+const Tag = styled.div<TagProps>`
+  background: ${({color}) => (color ? color : 'white')};
 `
-      : `
-    color: #626aaa;
-    background: white;
-`}
+
+const MenuButton = styled.div`
+  background: white;
+  color: #ED827B;
 
   &:hover {
+    background: #ED827B;
     color: white;
-    background: #626aaa;
   }
 `
 
 const SideBox: FC = () => {
-  const router = useRouter()
-  const {dispatch: dispatchModal} = useContext(ModalContext)
-  const {dispatch: dispatchPlaylistForm} = useContext(PlaylistFormContext)
+  const {state} = useContext(MockContext)
+  const {playlists, tags: mockTags} = state
 
-  const menuItems = [
+  const router = useRouter()
+  const {id} = router.query
+
+  const {name, description, tagIds} = playlists.find(
+    (playlist) => playlist.id === id
+  )
+
+  const tags = tagIds.map((tagId) =>
+    mockTags.find((mockTag) => mockTag.id === tagId)
+  )
+
+  const menuButtons = [
     {
       name: 'Add Media',
       icon: faPlus,
       onClick: () => {
-        router.push(`/playlists/${1}/media/new`)
-      },
-    },
-    {
-      name: 'Edit Playlist',
-      icon: faEdit,
-      onClick: () => {
-        dispatchPlaylistForm({mode: PlaylistFormMode.Edit})
-        dispatchModal({show: true, Content: PlaylistForm})
-      },
-    },
-    {
-      name: 'Delete Playlist',
-      icon: faTrash,
+        router.push('/playlists/1/media/new')
+      }
     },
   ]
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-2">Playlist</h1>
-      <p className="text-md font-normal">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua.
-      </p>
+    <div className="px-4 py-6">
+      <div>
+        <h1 className="text-xl text-gray-700 font-bold">{name}</h1>
+
+        <div className="flex flex-row flex-wrap items-center">
+          {tags.map(({id, name, color}) => (
+            <Tag
+              key={id}
+              color={color}
+              className="rounded my-2 mr-2 px-2 py-1 text-gray-700 text-xs font-medium"
+            >
+              {name}
+            </Tag>
+          ))}
+        </div>
+
+        <p className="text-md text-gray-700 font-medium mt-2">{description}</p>
+      </div>
 
       <HorizontalLine className="my-4" />
 
       <div>
-        {menuItems.map(({name, icon, onClick}) => (
-          <MenuItem
+        {menuButtons.map(({name, icon, onClick}) => (
+          <MenuButton
             key={name}
-            className="flex flex-row items-center rounded my-2 py-2 pl-2 cursor-pointer"
+            className="rounded p-2 cursor-pointer flex flex-row items-center"
             onClick={onClick}
           >
-            <FontAwesomeIcon icon={icon} className="mr-4" />
-            <h4 className="text-lg font-medium">{name}</h4>
-          </MenuItem>
+            <FontAwesomeIcon icon={icon} />
+            <span className="text-md font-medium ml-4">{name}</span>
+          </MenuButton>
         ))}
       </div>
     </div>
@@ -87,9 +90,21 @@ const SideBox: FC = () => {
 }
 
 const Playlist: NextPage = () => {
+  const router = useRouter()
+  const {id} = router.query
+
+  const {state} = useContext(MockContext)
+  const {playlists, media: mockMedia} = state
+  const playlist = playlists.find((playlist) => playlist.id === id)
+  const media = mockMedia.filter((media) => media.playlistId === playlist.id)
+
   return (
     <Layout SideComponent={SideBox}>
-      <h1>Playlist</h1>
+      <div className="px-10 mt-8 mx-auto">
+        {media.map((mediaOne) => (
+          <MediaCard key={mediaOne.id} media={mediaOne} />
+        ))}
+      </div>
     </Layout>
   )
 }

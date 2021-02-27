@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {},
     redirect: {
-      destination: '/demo/playlists'
+      destination: '/playlists'
     }
   }
 }
