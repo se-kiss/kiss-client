@@ -4,7 +4,8 @@ import {ModalProvider} from '../lib/useModal'
 import styled from 'styled-components'
 
 const PageContainer = styled.div`
-  min-height: calc(100vh - 3.5rem);
+  min-width: 1024px;
+  min-height: calc(100vh - 4rem);
 `
 
 const MainContainer = styled.div`

@@ -7,7 +7,7 @@ import {
   Reducer,
 } from 'react'
 
-interface ModalState {
+type ModalState = {
   show: boolean
   Content: FC<any>
 }

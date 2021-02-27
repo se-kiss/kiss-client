@@ -8,6 +8,7 @@ const Background = styled.div`
   position: absolute;
   top: 0;
   left: 0;
+  min-width: 1024px;
   width: 100vw;
   height: 100vh;
   background: black;
@@ -16,7 +17,7 @@ const Background = styled.div`
 
 const Container = styled.div`
   top: 10%;
-  left: 30%;
+  left: 20%;
 `
 
 const Card: FC = ({children}) => {
@@ -29,7 +30,7 @@ const Card: FC = ({children}) => {
 
   return (
     <div className="relative w-full h-full">
-      <Container className="absolute left-1/3 bg-white w-2/5 h-auto rounded">
+      <Container className="absolute bg-white w-3/5 h-auto rounded">
         <div className="relative w-full h-full">
           <div className="absolute top-0 right-0">
             <FontAwesomeIcon
@@ -54,7 +55,7 @@ const Modal: FC = () => {
   }
 
   return (
-    <div className="absolute top-0 left-0 w-screen h-screen">
+    <div className="fixed z-20 top-0 left-0 w-screen h-screen">
       <Background />
       <Card>
         <ModalContent />
