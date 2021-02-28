@@ -2,17 +2,8 @@ import {useRouter} from 'next/router'
 import {FC} from 'react'
 import useModal, {ModalActionTypes} from '../../lib/useModal'
 import usePlaylistForm, {PlaylistFormProvider} from '../../lib/usePlaylistForm'
-import styled from 'styled-components'
+import {OutlinedButton} from '../'
 
-const OutlinedButton = styled.button`
-  border: 1px solid #ff8a83;
-  color: #ff8a83;
-
-  &:hover {
-    color: white;
-    background: #ff8a83;
-  }
-`
 
 const Form: FC = () => {
   const router = useRouter()
