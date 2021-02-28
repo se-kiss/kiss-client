@@ -1,8 +1,9 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout, HorizontalLine, AuthModal} from '../../../../components'
+import {Layout, HorizontalLine, AuthModal, CommentSidebar} from '../../../../components'
 import useModal, {ModalActionTypes} from '../../../../lib/useModal'
+import useSidebar, {SidebarActionTypes} from '../../../../lib/useSidebar'
 import {MockContext} from '../../../../mock/MockContext'
 import {MediaTypes, MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -39,6 +40,7 @@ const SideBox: FC = () => {
   const owner = users.find((user) => user.id === ownerId)
 
   const {dispatch: dispatchModal} = useModal()
+  const {dispatch: dispatchSidebar} = useSidebar()
 
   const onAuthModalShow = () => {
     dispatchModal({
@@ -61,6 +63,14 @@ const SideBox: FC = () => {
     {
       name: 'Comment',
       icon: faComment,
+      onClick: () => {
+        dispatchSidebar({
+          type: SidebarActionTypes.ShowSidebar,
+          payload: {
+            Content: CommentSidebar,
+          }
+        })
+      }
     },
     {
       name: 'Bookmark',
@@ -81,11 +91,11 @@ const SideBox: FC = () => {
       <HorizontalLine className="my-4" />
 
       <div>
-        {menuButtons.map(({name, icon}) => (
+        {menuButtons.map(({name, icon, onClick}) => (
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
-            onClick={onAuthModalShow}
+            onClick={true ? onClick : onAuthModalShow}
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
