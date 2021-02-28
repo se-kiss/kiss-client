@@ -1,7 +1,8 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useContext} from 'react'
-import {Layout, HorizontalLine} from '../../../../components'
+import {Layout, HorizontalLine, AuthModal} from '../../../../components'
+import useModal, {ModalActionTypes} from '../../../../lib/useModal'
 import {MockContext} from '../../../../mock/MockContext'
 import {MediaTypes, MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -10,7 +11,7 @@ import {faComment, faBookmark} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
 
 const Button = styled.button`
-  background: #ED827B;
+  background: #ed827b;
   color: white;
 
   &:focus {
@@ -20,10 +21,10 @@ const Button = styled.button`
 
 const MenuButton = styled.div`
   background: white;
-  color: #ED827B;
+  color: #ed827b;
 
   &:hover {
-    background: #ED827B;
+    background: #ed827b;
     color: white;
   }
 `
@@ -32,10 +33,21 @@ const SideBox: FC = () => {
   const router = useRouter()
   const {id} = router.query
 
-  const {state} = useContext(MockContext)
-  const {playlists, users} = state
+  const {state: mockState} = useContext(MockContext)
+  const {playlists, users} = mockState
   const {ownerId} = playlists.find((playlist) => playlist.id === id)
   const owner = users.find((user) => user.id === ownerId)
+
+  const {dispatch: dispatchModal} = useModal()
+
+  const onAuthModalShow = () => {
+    dispatchModal({
+      type: ModalActionTypes.ShowModal,
+      payload: {
+        Content: AuthModal,
+      },
+    })
+  }
 
   const menuButtons = [
     {
@@ -73,6 +85,7 @@ const SideBox: FC = () => {
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
+            onClick={onAuthModalShow}
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
@@ -120,8 +133,10 @@ const Media: NextPage = () => {
 
   const MediaComponent = ((type) => {
     switch (type) {
-      case MediaTypes.Article: return Article
-      case MediaTypes.Video: return Video
+      case MediaTypes.Article:
+        return Article
+      case MediaTypes.Video:
+        return Video
     }
   })(media.type)
 

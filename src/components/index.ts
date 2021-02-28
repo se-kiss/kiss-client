@@ -1,5 +1,6 @@
 export {default as Layout} from './Layout'
 export {default as Navbar} from './Navbar'
 export {default as Modal} from './Modal'
+export {default as AuthModal} from './AuthModal'
 export {default as HorizontalLine} from './HorizontalLine'
 export {default as OutlinedButton} from './OutlinedButton'
