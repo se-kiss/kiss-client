@@ -1,8 +1,13 @@
 import {NextPage} from 'next'
-import {FC, useContext} from 'react'
+import {FC, useContext, createRef} from 'react'
 import {Layout} from '../../../../components'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faTimes, faVideo} from '@fortawesome/free-solid-svg-icons'
+import {
+  faPlus,
+  faTimes,
+  faUpload,
+  faVideo,
+} from '@fortawesome/free-solid-svg-icons'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import useMediaForm, {
   MediaFormActionTypes,
@@ -43,6 +48,11 @@ const OutlinedButton = styled.button`
     color: white;
     background: #ff8a83;
   }
+`
+
+const Button = styled.button`
+  color: white;
+  background: #ff8a83;
 `
 
 const SideBox: FC = () => {
@@ -89,11 +99,10 @@ const SideBox: FC = () => {
   )
 }
 
-const ArticleForm: FC = () => {
+const FormHeader: FC = () => {
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {state: mockState} = useContext(MockContext)
   const {tags} = mockState
-  const {paragraph, paragraphIndex} = formState
 
   const onEditName = (name) => {
     dispatchForm({
@@ -103,6 +112,55 @@ const ArticleForm: FC = () => {
       },
     })
   }
+
+  return (
+    <>
+      <div>
+        <h3 className="text-md text-gray-700 font-medium mb-2">Name</h3>
+        <input
+          type="text"
+          className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
+          value={formState.name}
+          onChange={(e) => onEditName(e.target.value)}
+        />
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-md text-gray-700 font-medium mb-2">Tags</h3>
+
+        <div className="w-full flex flex-row flex-wrap">
+          {tags.map(({id, name, color}) => (
+            <Tag
+              key={id}
+              color={color}
+              className="rounded my-1 mr-2 px-2 text-sm text-gray-700 font-medium border cursor-pointer"
+            >
+              {name}
+            </Tag>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
+
+const FormButtons: FC = () => {
+  return (
+    <div className="mt-16 flex flex-row justify-around">
+      <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
+        Cancel
+      </OutlinedButton>
+
+      <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
+        Create
+      </OutlinedButton>
+    </div>
+  )
+}
+
+const ArticleForm: FC = () => {
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
+  const {paragraph, paragraphIndex} = formState
 
   const onAddParagraph = () => {
     dispatchForm({
@@ -145,32 +203,8 @@ const ArticleForm: FC = () => {
   }
 
   return (
-    <div>
-      <div>
-        <h3 className="text-md text-gray-700 font-medium mb-2">Name</h3>
-        <input
-          type="text"
-          className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
-          value={formState.name}
-          onChange={(e) => onEditName(e.target.value)}
-        />
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-md text-gray-700 font-medium mb-2">Tags</h3>
-
-        <div className="w-full flex flex-row flex-wrap">
-          {tags.map(({id, name, color}) => (
-            <Tag
-              key={id}
-              color={color}
-              className="rounded my-1 mr-2 px-2 text-sm text-gray-700 font-medium border cursor-pointer"
-            >
-              {name}
-            </Tag>
-          ))}
-        </div>
-      </div>
+    <div className="px-10 py-6">
+      <FormHeader />
 
       <div className="mt-8">
         <h3 className="text-md text-gray-700 font-medium mb-2">Content</h3>
@@ -205,27 +239,73 @@ const ArticleForm: FC = () => {
         </div>
       </div>
 
-      <div className="mt-16 flex flex-row justify-around">
-        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
-          Cancel
-        </OutlinedButton>
-
-        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
-          Create
-        </OutlinedButton>
-      </div>
+      <FormButtons />
     </div>
+  )
+}
+
+const VideoForm: FC = () => {
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
+  const {description} = formState
+  const FileInputRef = createRef<HTMLInputElement>()
+
+  const onUploadVideo = () => {
+    FileInputRef.current.click()
+  }
+
+  const onEditDescription = (text: string) => {
+    dispatchForm({
+      type: MediaFormActionTypes.EditDescription,
+      payload: {
+        description: text,
+      },
+    })
+  }
+
+  return (
+    <>
+      <div className="w-full h-80 bg-black rounded-t-xl flex justify-center items-center">
+        <Button
+          className="text-lg font-medium px-8 py-1 rounded focus:outline-none hover:bg-red-400"
+          onClick={onUploadVideo}
+        >
+          <FontAwesomeIcon icon={faUpload} />
+          <span className="ml-2">Upload</span>
+        </Button>
+
+        <input type="file" className="hidden" ref={FileInputRef} />
+      </div>
+
+      <div className="px-10 py-6">
+        <FormHeader />
+
+        <div className="mt-8">
+          <h3 className="text-md text-gray-700 font-medium mb-2">
+            Description
+          </h3>
+          <textarea
+            rows={8}
+            className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
+            value={description}
+            onChange={(e) => onEditDescription(e.target.value)}
+          />
+        </div>
+
+        <FormButtons />
+      </div>
+    </>
   )
 }
 
 const Form: FC = () => {
   const {state: formState} = useMediaForm()
+  console.log(formState)
 
   switch (formState.type) {
     case MediaTypes.Article:
       return <ArticleForm />
     case MediaTypes.Video:
-      return null
+      return <VideoForm />
     default:
       return null
   }
@@ -235,7 +315,7 @@ const MediaForm: NextPage = () => {
   return (
     <MediaFormProvider>
       <Layout SideComponent={SideBox}>
-        <div className="w-10/12 px-10 py-6 mt-8 mx-auto bg-white rounded-xl shadow-xl">
+        <div className="w-10/12 mt-8 mx-auto bg-white rounded-xl shadow-xl">
           <Form />
         </div>
       </Layout>

@@ -13,6 +13,7 @@ type MediaFormState = {
   name: string
   paragraph?: string[]
   paragraphIndex: number
+  description?: string
 }
 
 const initialState: MediaFormState = {
@@ -20,6 +21,7 @@ const initialState: MediaFormState = {
   name: '',
   paragraph: [''],
   paragraphIndex: 0,
+  description: '',
 }
 
 export enum MediaFormActionTypes {
@@ -29,6 +31,7 @@ export enum MediaFormActionTypes {
   EditParagraph = 'EDIT_PARAGRAPH',
   RemoveParagraph = 'REMOVE_PARAGRAPH',
   FocusParagraph = 'FOCUS_PARAGRAPH',
+  EditDescription = 'EDIT_DESCRIPTION',
 }
 
 type MediaFormPayload = Partial<Omit<MediaFormState, 'paragraph'>> & {
@@ -85,6 +88,12 @@ const reducer: Reducer<MediaFormState, MediaFormAction> = (state, action) => {
       return {
         ...state,
         paragraphIndex: action.payload.paragraph.index,
+      }
+
+    case MediaFormActionTypes.EditDescription:
+      return {
+        ...state,
+        description: action.payload.description,
       }
 
     default:
