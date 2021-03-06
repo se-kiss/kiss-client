@@ -1,10 +1,12 @@
 import {FC} from 'react'
-import {Navbar, Modal} from './'
+import {Navbar, Modal, Sidebar} from './'
 import {ModalProvider} from '../lib/useModal'
+import {SidebarProvider} from '../lib/useSidebar'
 import styled from 'styled-components'
 
 const PageContainer = styled.div`
-  min-height: calc(100vh - 3.5rem);
+  min-width: 1024px;
+  min-height: calc(100vh - 4rem);
 `
 
 const MainContainer = styled.div`
@@ -18,6 +20,7 @@ type LayoutProps = {
 const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
   return (
     <ModalProvider>
+      <SidebarProvider>
       <Navbar />
 
       <PageContainer className="px-8 pt-14 flex flex-row justify-center">
@@ -31,10 +34,13 @@ const Layout: FC<LayoutProps> = ({children, SideComponent}) => {
 
         <MainContainer className="h-full">{children}</MainContainer>
 
-        <div className="flex-1 h-full"></div>
+        <div className="flex-1 h-full">
+          <Sidebar />
+        </div>
       </PageContainer>
           
       <Modal />
+      </SidebarProvider>
     </ModalProvider>
   )
 }
