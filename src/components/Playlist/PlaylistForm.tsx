@@ -5,7 +5,6 @@ import usePlaylistForm, {PlaylistFormProvider} from '../../lib/usePlaylistForm'
 import {OutlinedButton} from '../'
 
 const Form: FC = () => {
-  // const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()
   const {dispatch: dispatchModal} = useModal()
 
@@ -27,7 +26,6 @@ const Form: FC = () => {
 
   const onPlaylistCreate = () => {
     onModalClose()
-    // router.push('/playlists/1/media')
   }
 
   return (
