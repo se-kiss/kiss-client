@@ -21,7 +21,7 @@
   },
   "scripts": {
     "dev": "next",
-    "build": "yarn generate && next build",
+    "build": "next build",
     "start": "next start",
     "postbuild": "next-on-netlify",
     "lint": "eslint --ext .ts,.tsx src",
