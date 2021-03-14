@@ -1,7 +1,7 @@
 import {FC} from 'react'
 import useModal, {ModalActionTypes} from '../../lib/useModal'
 import usePlaylistForm, {PlaylistFormProvider} from '../../lib/usePlaylistForm'
-import {OutlinedButton} from '../'
+import {OutlinedButton} from '../common'
 
 const Form: FC = () => {
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()

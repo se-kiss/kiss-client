@@ -1,6 +1,7 @@
 import {NextPage} from 'next'
 import {FC} from 'react'
-import {Layout, HorizontalLine} from '../../../../components'
+import {Layout} from '../../../../components'
+import {HorizontalLine} from '../../../../components/common'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'

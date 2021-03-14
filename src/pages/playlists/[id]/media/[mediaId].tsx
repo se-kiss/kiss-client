@@ -1,6 +1,7 @@
 import {NextPage} from 'next'
 import {FC} from 'react'
-import {Layout, HorizontalLine, AuthModal, CommentSidebar} from '../../../../components'
+import {Layout, AuthModal, CommentSidebar} from '../../../../components'
+import {HorizontalLine} from '../../../../components/common'
 import useModal, {ModalActionTypes} from '../../../../lib/useModal'
 import useSidebar, {SidebarActionTypes} from '../../../../lib/useSidebar'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
