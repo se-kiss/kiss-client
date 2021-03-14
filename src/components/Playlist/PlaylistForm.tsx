@@ -1,21 +1,10 @@
-import {useRouter} from 'next/router'
+// import {useRouter} from 'next/router'
 import {FC} from 'react'
 import useModal, {ModalActionTypes} from '../../lib/useModal'
 import usePlaylistForm, {PlaylistFormProvider} from '../../lib/usePlaylistForm'
-import styled from 'styled-components'
-
-const OutlinedButton = styled.button`
-  border: 1px solid #ff8a83;
-  color: #ff8a83;
-
-  &:hover {
-    color: white;
-    background: #ff8a83;
-  }
-`
+import {OutlinedButton} from '../'
 
 const Form: FC = () => {
-  const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()
   const {dispatch: dispatchModal} = useModal()
 
@@ -36,9 +25,7 @@ const Form: FC = () => {
   }
 
   const onPlaylistCreate = () => {
-    closeModal()
-    clearForm()
-    router.push('/playlists/1/media')
+    onModalClose()
   }
 
   return (

@@ -1,16 +1,16 @@
 import {NextPage} from 'next'
-import {useRouter} from 'next/router'
-import {FC, useContext} from 'react'
-import {Layout, HorizontalLine} from '../../../../components'
-import {MockContext} from '../../../../mock/MockContext'
-import {MediaTypes, MediaType} from '../../../../mock/data'
+import {FC} from 'react'
+import {Layout, HorizontalLine, AuthModal, CommentSidebar} from '../../../../components'
+import useModal, {ModalActionTypes} from '../../../../lib/useModal'
+import useSidebar, {SidebarActionTypes} from '../../../../lib/useSidebar'
+import {MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faArrowUp, faArrowDown} from '@fortawesome/free-solid-svg-icons'
 import {faComment, faBookmark} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
 
 const Button = styled.button`
-  background: #ED827B;
+  background: #ed827b;
   color: white;
 
   &:focus {
@@ -20,22 +20,26 @@ const Button = styled.button`
 
 const MenuButton = styled.div`
   background: white;
-  color: #ED827B;
+  color: #ed827b;
 
   &:hover {
-    background: #ED827B;
+    background: #ed827b;
     color: white;
   }
 `
 
 const SideBox: FC = () => {
-  const router = useRouter()
-  const {id} = router.query
+  const {dispatch: dispatchModal} = useModal()
+  const {dispatch: dispatchSidebar} = useSidebar()
 
-  const {state} = useContext(MockContext)
-  const {playlists, users} = state
-  const {ownerId} = playlists.find((playlist) => playlist.id === id)
-  const owner = users.find((user) => user.id === ownerId)
+  const onAuthModalShow = () => {
+    dispatchModal({
+      type: ModalActionTypes.ShowModal,
+      payload: {
+        Content: AuthModal,
+      },
+    })
+  }
 
   const menuButtons = [
     {
@@ -49,6 +53,14 @@ const SideBox: FC = () => {
     {
       name: 'Comment',
       icon: faComment,
+      onClick: () => {
+        dispatchSidebar({
+          type: SidebarActionTypes.ShowSidebar,
+          payload: {
+            Content: CommentSidebar,
+          }
+        })
+      }
     },
     {
       name: 'Bookmark',
@@ -61,7 +73,7 @@ const SideBox: FC = () => {
       <div className="flex flex-row items-start">
         <div className="w-7 h-7 rounded-full bg-red-400 mr-4" />
         <div>
-          <h4 className="text-lg text-gray-700 font-medium">{owner.name}</h4>
+          <h4 className="text-lg text-gray-700 font-medium"></h4>
           <Button className="px-4 rounded text-sm font-medium">Follow</Button>
         </div>
       </div>
@@ -69,10 +81,11 @@ const SideBox: FC = () => {
       <HorizontalLine className="my-4" />
 
       <div>
-        {menuButtons.map(({name, icon}) => (
+        {menuButtons.map(({name, icon, onClick}) => (
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
+            onClick={true ? onClick : onAuthModalShow}
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
@@ -111,24 +124,9 @@ const Video: FC<MediaComponentProps> = ({media}) => {
 }
 
 const Media: NextPage = () => {
-  const router = useRouter()
-  const {mediaId} = router.query
-
-  const {state} = useContext(MockContext)
-  const {media: mockMedia} = state
-  const media = mockMedia.find((mediaOne) => mediaOne.id === mediaId)
-
-  const MediaComponent = ((type) => {
-    switch (type) {
-      case MediaTypes.Article: return Article
-      case MediaTypes.Video: return Video
-    }
-  })(media.type)
-
   return (
     <Layout SideComponent={SideBox}>
       <div className="px-10 mt-8 mx-auto flex flex-row justify-center">
-        <MediaComponent media={media} />
       </div>
     </Layout>
   )
