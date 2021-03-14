@@ -90,20 +90,21 @@ const SideBox: FC = () => {
 }
 
 const Playlist: NextPage = () => {
-  const router = useRouter()
-  const {id} = router.query
+  // const router = useRouter()
+  // const {id} = router.query
 
-  const {state} = useContext(MockContext)
-  const {playlists, media: mockMedia} = state
-  const playlist = playlists.find((playlist) => playlist.id === id)
-  const media = mockMedia.filter((media) => media.playlistId === playlist.id)
+  // const {state} = useContext(MockContext)
+  // const {playlists, media: mockMedia} = state
+  // const playlist = playlists.find((playlist) => playlist.id === id)
+  // const media = mockMedia.filter((media) => media.playlistId === playlist.id)
 
   return (
-    <Layout SideComponent={SideBox}>
+    // <Layout SideComponent={SideBox}>
+    <Layout>
       <div className="px-10 mt-8 mx-auto">
-        {media.map((mediaOne) => (
+        {/* {media.map((mediaOne) => (
           <MediaCard key={mediaOne.id} media={mediaOne} />
-        ))}
+        ))} */}
       </div>
     </Layout>
   )

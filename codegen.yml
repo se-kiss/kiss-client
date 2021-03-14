@@ -1,0 +1,6 @@
+schema: ${NEXT_PUBLIC_API_URL}
+generates:
+  ./src/types/generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
