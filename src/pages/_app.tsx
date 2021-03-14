@@ -1,7 +1,6 @@
 import {AppProps} from 'next/app'
 import Head from 'next/head'
 import {FC} from 'react'
-import {MockProvider} from '../mock/MockContext'
 import {createGlobalStyle} from 'styled-components'
 import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client'
 import 'tailwindcss/tailwind.css'
@@ -26,9 +25,7 @@ const App: FC<AppProps> = ({Component, pageProps}) => {
       </Head>
       <GlobalStyle />
       <ApolloProvider client={client}>
-        <MockProvider>
           <Component {...pageProps} />
-        </MockProvider>
       </ApolloProvider>
     </>
   )

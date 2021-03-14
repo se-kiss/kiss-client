@@ -2,8 +2,10 @@ import {NextPage} from 'next'
 import {FC, useContext} from 'react'
 import {Layout} from '../../components'
 import {ActionTypes, MockContext} from '../../mock/MockContext'
-import {PlaylistCard} from '../../components/Playlist'
+// import {PlaylistCard} from '../../components/Playlist'
+import {gql, useQuery} from '@apollo/client'
 import styled from 'styled-components'
+import { Query } from '../../types/generated/graphql'
 
 type TagProps = {
   color?: string
@@ -59,32 +61,51 @@ const SideBox: FC = () => {
   )
 }
 
+const GET_PLAYLIST = gql`
+  query GetPlaylist {
+    playlists {
+      _id
+      name
+      ownerId
+      description
+      tagIds
+      _createdAt
+      _updatedAt
+    }
+  }
+`
+
 const Playlists: NextPage = () => {
-  const {state} = useContext(MockContext)
-  const {playlists, search} = state
+  const {data, loading} = useQuery<Pick<Query, 'playlists'>>(GET_PLAYLIST)
 
-  // TODO: this is for demo
-  console.log(search)
-  const searchResults = []
-  search.tagIds.forEach((tagId) => {
-    const filtered = playlists.filter((playlist) =>
-      playlist.tagIds.includes(tagId)
-    )
-    filtered.forEach((playlist) => {
-      if (!searchResults.includes(playlist)) {
-        searchResults.push(playlist)
-      }
-    })
-  })
+  if (loading) return <h1>Loading...</h1>
+  console.log(data)
+  // const {playlists} = data
+  // const {state} = useContext(MockContext)
+  // const {playlists, search} = state
 
-  const results = search.tagIds.length !== 0 ? searchResults : playlists
+  // // TODO: this is for demo
+  // console.log(search)
+  // const searchResults = []
+  // search.tagIds.forEach((tagId) => {
+  //   const filtered = playlists.filter((playlist) =>
+  //     playlist.tagIds.includes(tagId)
+  //   )
+  //   filtered.forEach((playlist) => {
+  //     if (!searchResults.includes(playlist)) {
+  //       searchResults.push(playlist)
+  //     }
+  //   })
+  // })
+
+  // const results = search.tagIds.length !== 0 ? searchResults : playlists
 
   return (
     <Layout SideComponent={SideBox}>
       <div className="px-10 mt-8 mx-auto">
-        {results.map((playlist) => (
-          <PlaylistCard key={playlist.id} playlist={playlist} />
-        ))}
+        {/* {playlists.map((playlist) => (
+          <PlaylistCard key={playlist._id} playlist={playlist} />
+        ))} */}
       </div>
     </Layout>
   )
