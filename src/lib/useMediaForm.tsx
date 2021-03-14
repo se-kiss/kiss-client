@@ -6,10 +6,10 @@ import {
   FC,
   Reducer,
 } from 'react'
-import {MediaTypes} from '../mock/data'
+import {MediaType} from '../types/generated/graphql'
 
 type MediaFormState = {
-  type: MediaTypes
+  type: MediaType
   name: string
   paragraph?: string[]
   paragraphIndex: number
@@ -17,7 +17,7 @@ type MediaFormState = {
 }
 
 const initialState: MediaFormState = {
-  type: MediaTypes.Article,
+  type: MediaType.Article,
   name: '',
   paragraph: [''],
   paragraphIndex: 0,

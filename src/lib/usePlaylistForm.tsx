@@ -21,7 +21,6 @@ const reducer: Reducer<PlaylistFormState, Partial<PlaylistFormState>> = (
   prev,
   current
 ) => {
-  console.log(current)
   return {
     ...prev,
     ...current,

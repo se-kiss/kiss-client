@@ -3,7 +3,6 @@ import {FC} from 'react'
 import {Layout, HorizontalLine, AuthModal, CommentSidebar} from '../../../../components'
 import useModal, {ModalActionTypes} from '../../../../lib/useModal'
 import useSidebar, {SidebarActionTypes} from '../../../../lib/useSidebar'
-import {MediaType} from '../../../../mock/data'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faArrowUp, faArrowDown} from '@fortawesome/free-solid-svg-icons'
 import {faComment, faBookmark} from '@fortawesome/free-regular-svg-icons'
@@ -96,28 +95,23 @@ const SideBox: FC = () => {
   )
 }
 
-type MediaComponentProps = {
-  media: MediaType
-}
 
-const Article: FC<MediaComponentProps> = ({media}) => {
-  const {name, content} = media
+const Article: FC = () => {
   return (
     <div className="bg-white w-10/12 h-auto px-10 pt-6 pb-20 rounded-xl shadow-xl">
-      <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
-      <p className="text-lg text-gray-700 font-normal mt-4">{content}</p>
+      <h1 className="text-2xl text-gray-700 font-semibold"></h1>
+      <p className="text-lg text-gray-700 font-normal mt-4"></p>
     </div>
   )
 }
 
-const Video: FC<MediaComponentProps> = ({media}) => {
-  const {name, description, url} = media
+const Video: FC = () => {
   return (
     <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
-      <iframe src={url} className="w-full h-80 rounded-t-xl" />
+      <iframe className="w-full h-80 rounded-t-xl" />
       <div className="px-10 pt-4 pb-8">
-        <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
-        <p className="text-md text-gray-700 font-normal mt-2">{description}</p>
+        <h1 className="text-2xl text-gray-700 font-semibold"></h1>
+        <p className="text-md text-gray-700 font-normal mt-2"></p>
       </div>
     </div>
   )

@@ -1,11 +1,10 @@
 import Link from 'next/link'
-import {FC, useContext} from 'react'
+import {FC} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import useModal, {ModalActionTypes} from '../lib/useModal'
 import {PlaylistForm} from '../components/Playlist'
 import styled from 'styled-components'
-import {MockContext} from '../mock/MockContext'
 
 const Container = styled.div`
   background: #FF8A83;
@@ -32,9 +31,6 @@ const Button = styled.button`
 
 const NavbarEnd: FC = () => {
   const {dispatch: dispatchModal} = useModal()
-  const {state} = useContext(MockContext)
-  const {users} = state
-  const user = users[0]
 
   const onPlaylistAddClick = () => {
     dispatchModal({
@@ -45,7 +41,7 @@ const NavbarEnd: FC = () => {
     })
   }
 
-  if (!user) {
+  if (!true) {
     return (
       <div className="flex flex-row items-center">
         <h1 className="text-md text-white font-medium mx-4 cursor-pointer">
@@ -63,7 +59,7 @@ const NavbarEnd: FC = () => {
     <div className="flex flex-row items-center">
       <div className="flex flex-row items-center mx-4 cursor-pointer">
         <div className="w-7 h-7 bg-white rounded-full mr-2" />
-        <h1 className="text-md font-medium text-white">{user.name}</h1>
+        <h1 className="text-md font-medium text-white"></h1>
       </div>
 
       <IconButton
