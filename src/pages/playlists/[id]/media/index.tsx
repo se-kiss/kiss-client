@@ -2,7 +2,11 @@ import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
-import {HorizontalLine, Tag} from '../../../../components/common'
+import {
+  HorizontalLine,
+  Tag,
+  OutlinedButton,
+} from '../../../../components/common'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faEdit, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 import usePlaylistForm, {
@@ -11,8 +15,10 @@ import usePlaylistForm, {
 } from '../../../../lib/usePlaylistForm'
 import useModal, {ModalActionTypes} from '../../../../lib/useModal'
 import styled from 'styled-components'
-import {gql, useQuery} from '@apollo/client'
+import {gql, useQuery, useMutation} from '@apollo/client'
 import {
+  Mutation,
+  MutationDeletePlaylistArgs,
   Query,
   QueryMediaArgs,
   QueryPlaylistsArgs,
@@ -41,6 +47,76 @@ const GET_PLAYLIST = gql`
     }
   }
 `
+
+const DELETE_PLAYLIST = gql`
+  mutation DeletePlaylist($args: DeletePlaylistArgs!) {
+    deletePlaylist(args: $args) {
+      _id
+    }
+  }
+`
+
+const ConfirmDeletePlaylist: FC = () => {
+  const router = useRouter()
+  const {id: playlistId} = router.query
+
+  const {dispatch: dispatchModal} = useModal()
+  const [deletePlaylist] = useMutation<
+    Pick<Mutation, 'deletePlaylist'>,
+    MutationDeletePlaylistArgs
+  >(DELETE_PLAYLIST)
+
+  if (!playlistId) {
+    return <h1>Loading...</h1>
+  }
+
+  const closeModal = () =>
+    dispatchModal({
+      type: ModalActionTypes.CloseModal,
+    })
+
+  const onModalClose = () => {
+    closeModal()
+  }
+
+  const onConfirm = () => {
+    deletePlaylist({
+      variables: {
+        args: {
+          _id: playlistId as string,
+        },
+      },
+      update: (cache) => {
+        cache.reset()
+        router.push('/playlists')
+      },
+    })
+    closeModal()
+  }
+
+  return (
+    <div className="p-8">
+      <h1 className="w-full h-60 flex-1 text-2xl text-gray-700 text-center font-medium">
+        Delete This Playlist ?
+      </h1>
+
+      <div className="flex flex-row justify-around">
+        <OutlinedButton
+          className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
+          onClick={onModalClose}
+        >
+          Cancel
+        </OutlinedButton>
+        <OutlinedButton
+          className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
+          onClick={onConfirm}
+        >
+          Confirm
+        </OutlinedButton>
+      </div>
+    </div>
+  )
+}
 
 const SideBox: FC = () => {
   const router = useRouter()
@@ -84,7 +160,7 @@ const SideBox: FC = () => {
       icon: faEdit,
       onClick: () => {
         alert('Edit Media')
-      }
+      },
     },
     {
       name: 'Edit Playlist',
@@ -94,6 +170,7 @@ const SideBox: FC = () => {
           type: PlaylistFormActionType.ModifyForm,
           payload: {
             type: PlaylistFormType.Edit,
+            id: playlistId as string,
             name,
             description,
           },
@@ -109,8 +186,13 @@ const SideBox: FC = () => {
       name: 'Delete Playlist',
       icon: faTrashAlt,
       onClick: () => {
-        alert('Delete Playlist')
-      }
+        dispatchModal({
+          type: ModalActionTypes.ShowModal,
+          payload: {
+            Content: ConfirmDeletePlaylist,
+          },
+        })
+      },
     },
   ]
 

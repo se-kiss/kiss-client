@@ -14,12 +14,14 @@ export enum PlaylistFormType {
 
 type PlaylistFormState = {
   type: PlaylistFormType
+  id: string
   name: string
   description: string
 }
 
 const initialState: PlaylistFormState = {
   type: PlaylistFormType.Create,
+  id: '',
   name: '',
   description: '',
 }

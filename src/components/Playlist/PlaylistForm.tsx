@@ -1,3 +1,4 @@
+import {useRouter} from 'next/router'
 import {FC} from 'react'
 import useModal, {ModalActionTypes} from '../../lib/useModal'
 import usePlaylistForm, {
@@ -5,10 +6,55 @@ import usePlaylistForm, {
   PlaylistFormType,
 } from '../../lib/usePlaylistForm'
 import {OutlinedButton} from '../common'
+import {gql, useMutation} from '@apollo/client'
+import {
+  Mutation,
+  MutationCreatePlaylistArgs,
+  MutationUpdatePlaylistArgs,
+} from '../../types/generated/graphql'
+
+const CREATE_PLAYLIST = gql`
+  mutation CreatePlaylist($args: CreatePlaylistArgs!) {
+    createPlaylist(args: $args) {
+      _id
+      name
+      ownerId
+      description
+      tagIds
+      _createdAt
+      _updatedAt
+    }
+  }
+`
+
+const UPDATE_PLAYLIST = gql`
+  mutation UpdatePlaylist($args: UpdatePlaylistArgs!) {
+    updatePlaylist(args: $args) {
+      _id
+      name
+      ownerId
+      description
+      tagIds
+      _createdAt
+      _updatedAt
+    }
+  }
+`
 
 const Form: FC = () => {
+  const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()
   const {dispatch: dispatchModal} = useModal()
+
+  const [createPlaylist] = useMutation<
+    Pick<Mutation, 'createPlaylist'>,
+    MutationCreatePlaylistArgs
+  >(CREATE_PLAYLIST)
+
+  const [updatePlaylist] = useMutation<
+    Pick<Mutation, 'updatePlaylist'>,
+    MutationUpdatePlaylistArgs
+  >(UPDATE_PLAYLIST)
 
   const formTitle = ((type) => {
     switch (type) {
@@ -35,10 +81,41 @@ const Form: FC = () => {
   }
 
   const onPlaylistCreate = () => {
+    const {name, description} = formState
+    // TODO: Replace hardcode with userId and remove tagIds from playlist
+    createPlaylist({
+      variables: {
+        args: {
+          name,
+          description,
+          ownerId: '604ef8ddb20501a019d40e23',
+          tagIds: ['604ef720854630484edc8c3e'],
+        },
+      },
+      update: (cache, {data}) => {
+        cache.reset()
+        
+        const {_id} = data.createPlaylist
+        router.push(`/playlists/${_id}/media`)
+      },
+    })
     onModalClose()
   }
 
   const onPlaylistUpdate = () => {
+    const {id: _id, name, description} = formState
+    updatePlaylist({
+      variables: {
+        args: {
+          _id,
+          name,
+          description,
+        }
+      },
+      update: (cache) => {
+        cache.reset()
+      }
+    })
     onModalClose()
   }
 
@@ -88,7 +165,11 @@ const Form: FC = () => {
 
         <OutlinedButton
           className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
-          onClick={formState.type === PlaylistFormType.Create ? onPlaylistCreate : onPlaylistUpdate}
+          onClick={
+            formState.type === PlaylistFormType.Create
+              ? onPlaylistCreate
+              : onPlaylistUpdate
+          }
         >
           {formState.type === PlaylistFormType.Create ? 'Create' : 'Update'}
         </OutlinedButton>

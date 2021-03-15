@@ -71,7 +71,7 @@ const NavbarEnd: FC = () => {
     <div className="flex flex-row items-center">
       <div className="flex flex-row items-center mx-4 cursor-pointer">
         <div className="w-7 h-7 bg-white rounded-full mr-2" />
-        <h1 className="text-md font-medium text-white"></h1>
+        <h1 className="text-md font-medium text-white">User</h1>
       </div>
 
       <IconButton
