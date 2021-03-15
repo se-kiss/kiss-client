@@ -7,29 +7,51 @@ import {
   useContext,
 } from 'react'
 
+export enum PlaylistFormType {
+  Create = 'CREATE',
+  Edit = 'EDIT',
+}
+
 type PlaylistFormState = {
+  type: PlaylistFormType
   name: string
   description: string
 }
 
 const initialState: PlaylistFormState = {
+  type: PlaylistFormType.Create,
   name: '',
   description: '',
 }
 
-const reducer: Reducer<PlaylistFormState, Partial<PlaylistFormState>> = (
-  prev,
-  current
+export enum PlaylistFormActionType {
+  ModifyForm = 'MODIFY_FORM',
+  ResetForm = 'RESET_FORM',
+}
+
+type PlaylistFormAction = {
+  type: PlaylistFormActionType
+  payload?: Partial<PlaylistFormState>
+}
+
+const reducer: Reducer<PlaylistFormState, PlaylistFormAction> = (
+  state,
+  action
 ) => {
-  return {
-    ...prev,
-    ...current,
+  switch (action.type) {
+    case PlaylistFormActionType.ModifyForm:
+      return {...state, ...action.payload}
+  
+    case PlaylistFormActionType.ResetForm:
+      return initialState
+    default:
+      return state
   }
 }
 
 interface IPlaylistFormContext {
   state: PlaylistFormState
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<PlaylistFormAction>
 }
 
 const PlaylistFormContext = createContext<IPlaylistFormContext>({

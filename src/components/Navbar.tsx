@@ -3,26 +3,30 @@ import {FC} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
 import useModal, {ModalActionTypes} from '../lib/useModal'
+import usePlaylistForm, {
+  PlaylistFormActionType,
+  PlaylistFormType,
+} from '../lib/usePlaylistForm'
 import {PlaylistForm} from '../components/Playlist'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  background: #FF8A83;
+  background: #ff8a83;
 `
 
 const IconButton = styled.div`
-  color: #ED827B;
+  color: #ed827b;
   background: white;
   cursor: pointer;
 
   &:hover {
     color: white;
-    background: #ED827B;
+    background: #ed827b;
   }
 `
 
 const Button = styled.button`
-  color: #ED827B;
+  color: #ed827b;
 
   &: focus {
     outline: none;
@@ -31,8 +35,16 @@ const Button = styled.button`
 
 const NavbarEnd: FC = () => {
   const {dispatch: dispatchModal} = useModal()
+  const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
 
   const onPlaylistAddClick = () => {
+    dispatchPlaylistForm({
+      type: PlaylistFormActionType.ModifyForm,
+      payload: {
+        type: PlaylistFormType.Create,
+      },
+    })
+
     dispatchModal({
       type: ModalActionTypes.ShowModal,
       payload: {

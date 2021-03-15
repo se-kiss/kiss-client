@@ -5,6 +5,11 @@ import {Layout} from '../../../../components'
 import {HorizontalLine, Tag} from '../../../../components/common'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faEdit, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
+import usePlaylistForm, {
+  PlaylistFormActionType,
+  PlaylistFormType,
+} from '../../../../lib/usePlaylistForm'
+import useModal, {ModalActionTypes} from '../../../../lib/useModal'
 import styled from 'styled-components'
 import {gql, useQuery} from '@apollo/client'
 import {
@@ -12,8 +17,9 @@ import {
   QueryMediaArgs,
   QueryPlaylistsArgs,
 } from '../../../../types/generated/graphql'
-import { faTrashAlt } from '@fortawesome/free-regular-svg-icons'
-import { MediaCard } from '../../../../components/Media'
+import {faTrashAlt} from '@fortawesome/free-regular-svg-icons'
+import {MediaCard} from '../../../../components/Media'
+import {PlaylistForm} from '../../../../components/Playlist'
 
 const MenuButton = styled.div`
   background: white;
@@ -40,6 +46,9 @@ const SideBox: FC = () => {
   const router = useRouter()
   const {id: playlistId} = router.query
 
+  const {dispatch: dispatchModal} = useModal()
+  const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
+
   if (!playlistId) {
     return <h1>Loading...</h1>
   }
@@ -50,7 +59,7 @@ const SideBox: FC = () => {
   >(GET_PLAYLIST, {
     variables: {
       args: {
-        ids: [playlistId as string,]
+        ids: [playlistId as string],
       },
     },
   })
@@ -68,19 +77,40 @@ const SideBox: FC = () => {
       icon: faPlus,
       onClick: () => {
         router.push(`/playlists/${playlistId}/media/new`)
-      }
+      },
     },
     {
       name: 'Edit Media',
       icon: faEdit,
+      onClick: () => {
+        alert('Edit Media')
+      }
     },
     {
       name: 'Edit Playlist',
       icon: faPencilAlt,
+      onClick: () => {
+        dispatchPlaylistForm({
+          type: PlaylistFormActionType.ModifyForm,
+          payload: {
+            type: PlaylistFormType.Edit,
+            name,
+            description,
+          },
+        })
+
+        dispatchModal({
+          type: ModalActionTypes.ShowModal,
+          payload: {Content: PlaylistForm},
+        })
+      },
     },
     {
       name: 'Delete Playlist',
       icon: faTrashAlt,
+      onClick: () => {
+        alert('Delete Playlist')
+      }
     },
   ]
 
@@ -163,15 +193,18 @@ const Playlist: NextPage = () => {
     return <h1>Loading...</h1>
   }
 
-  const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(GET_MEDIA, {
-    variables: {
-      args: {
-        filter: {
-          playlistId: playlistId as string
-        }
-      }
+  const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(
+    GET_MEDIA,
+    {
+      variables: {
+        args: {
+          filter: {
+            playlistId: playlistId as string,
+          },
+        },
+      },
     }
-  })
+  )
 
   if (loading) {
     return <h1>Loading...</h1>
