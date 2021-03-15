@@ -1,10 +1,19 @@
 import {NextPage} from 'next'
+import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
 import {HorizontalLine, Tag} from '../../../../components/common'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faEdit} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faEdit, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
+import {gql, useQuery} from '@apollo/client'
+import {
+  Query,
+  QueryMediaArgs,
+  QueryPlaylistsArgs,
+} from '../../../../types/generated/graphql'
+import { faTrashAlt } from '@fortawesome/free-regular-svg-icons'
+import { MediaCard } from '../../../../components/Media'
 
 const MenuButton = styled.div`
   background: white;
@@ -16,7 +25,62 @@ const MenuButton = styled.div`
   }
 `
 
+const GET_PLAYLIST = gql`
+  query GetPlaylist($args: GetPlaylistArgs) {
+    playlists(args: $args) {
+      _id
+      name
+      description
+      tagIds
+    }
+  }
+`
+
 const SideBox: FC = () => {
+  const router = useRouter()
+  const {id: playlistId} = router.query
+
+  if (!playlistId) {
+    return <h1>Loading...</h1>
+  }
+
+  const {loading: playlistLoading, data: playlistData} = useQuery<
+    Pick<Query, 'playlists'>,
+    QueryPlaylistsArgs
+  >(GET_PLAYLIST, {
+    variables: {
+      args: {
+        ids: [playlistId as string,]
+      },
+    },
+  })
+
+  if (playlistLoading) {
+    return <h1>Loading...</h1>
+  }
+
+  const {playlists} = playlistData
+  const {name, description} = playlists[0]
+
+  const menuButtons = [
+    {
+      name: 'Add Media',
+      icon: faPlus,
+    },
+    {
+      name: 'Edit Media',
+      icon: faEdit,
+    },
+    {
+      name: 'Edit Playlist',
+      icon: faPencilAlt,
+    },
+    {
+      name: 'Delete Playlist',
+      icon: faTrashAlt,
+    },
+  ]
+
   const tags = [
     {
       id: 0,
@@ -35,21 +99,10 @@ const SideBox: FC = () => {
     },
   ]
 
-  const menuButtons = [
-    {
-      name: 'Add Media',
-      icon: faPlus,
-    },
-    {
-      name: 'Edit / Delete Media',
-      icon: faEdit,
-    },
-  ]
-
   return (
     <div className="px-4 py-6">
       <div>
-        <h1 className="text-xl text-gray-700 font-bold">Playlist Name</h1>
+        <h1 className="text-xl text-gray-700 font-bold">{name}</h1>
 
         <div className="flex flex-row flex-wrap items-center mt-1">
           {tags.map(({id, name, color}) => (
@@ -63,7 +116,7 @@ const SideBox: FC = () => {
           ))}
         </div>
 
-        <p className="text-md text-gray-700 font-medium mt-2">Description</p>
+        <p className="text-sm text-gray-700 font-medium mt-2">{description}</p>
       </div>
 
       <HorizontalLine className="my-4" />
@@ -83,10 +136,52 @@ const SideBox: FC = () => {
   )
 }
 
+const GET_MEDIA = gql`
+  query GetMedia($args: GetMediaArgs) {
+    media(args: $args) {
+      _id
+      playlistId
+      name
+      description
+      tagIds
+      type
+      paragraph
+      _updatedAt
+    }
+  }
+`
+
 const Playlist: NextPage = () => {
+  const router = useRouter()
+  const {id: playlistId} = router.query
+
+  if (!playlistId) {
+    return <h1>Loading...</h1>
+  }
+
+  const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(GET_MEDIA, {
+    variables: {
+      args: {
+        filter: {
+          playlistId: playlistId as string
+        }
+      }
+    }
+  })
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
+
+  const {media} = data
+
   return (
     <Layout SideComponent={SideBox}>
-      <div className="px-10 mt-8 mx-auto"></div>
+      <div className="px-10 mt-8 mx-auto">
+        {media.map((mediaOne) => (
+          <MediaCard key={mediaOne._id} media={mediaOne} />
+        ))}
+      </div>
     </Layout>
   )
 }
