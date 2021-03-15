@@ -1,10 +1,13 @@
 import {GetServerSideProps, NextPage} from 'next'
 import {Layout} from '../components'
+import {Tag} from '../components/common'
 
 const Home: NextPage = () => {
   return (
     <Layout>
-      <h1>Hello World!</h1>
+      <div className="mt-8">
+        <Tag color="red">Hello World!</Tag>
+      </div>
     </Layout>
   )
 }
