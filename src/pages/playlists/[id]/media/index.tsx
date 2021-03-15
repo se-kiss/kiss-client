@@ -66,6 +66,9 @@ const SideBox: FC = () => {
     {
       name: 'Add Media',
       icon: faPlus,
+      onClick: () => {
+        router.push(`/playlists/${playlistId}/media/new`)
+      }
     },
     {
       name: 'Edit Media',
@@ -122,10 +125,11 @@ const SideBox: FC = () => {
       <HorizontalLine className="my-4" />
 
       <div>
-        {menuButtons.map(({name, icon}) => (
+        {menuButtons.map(({name, icon, onClick}) => (
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
+            onClick={onClick}
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
