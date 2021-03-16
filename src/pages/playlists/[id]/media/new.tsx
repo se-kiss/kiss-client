@@ -1,10 +1,10 @@
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
-import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
-import {ArticleForm, VideoForm, MediaFormButtons} from '../../../../components/MediaForm'
+import {ArticleForm, VideoForm, MediaFormButtons, PodcastForm} from '../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
   MediaFormProvider,
@@ -46,6 +46,11 @@ const SideBox: FC = () => {
       type: MediaType.Clip,
       name: 'Video',
       icon: faVideo,
+    },
+    {
+      type: MediaType.Podcast,
+      name: 'Podcast',
+      icon: faMicrophoneAlt,
     },
   ]
 
@@ -130,6 +135,8 @@ const Form: FC<FormProps> = ({playlistId}) => {
         return ArticleForm
       case MediaType.Clip:
         return VideoForm
+      case MediaType.Podcast:
+        return PodcastForm
     }
   })(formState.mediaType)
 
