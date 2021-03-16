@@ -1,16 +1,28 @@
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Tag} from '../common'
-import {User} from '../../types/generated/graphql'
+import {User, Subscription} from '../../types/generated/graphql'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUserFriends} from '@fortawesome/free-solid-svg-icons'
+import styled from 'styled-components'
+
+const Button = styled.button`
+  background: #ed827b;
+  color: white;
+
+  &:focus {
+    outline: none;
+  }
+`
 
 type ProfileCardProps = {
     user: User
+    // sub: Subscription
 }
 
 const ProfileCard: FC<ProfileCardProps> = ({user}) => {
-    const {_id, firstName, lastName} = user
+    const {firstName, lastName} = user
+    // const {userId,follower,following} = sub
     
     return(
         <div className="bg-white w-3/4 rounded-lg shadow-xl p-4 my-8 mx-auto">
@@ -21,7 +33,14 @@ const ProfileCard: FC<ProfileCardProps> = ({user}) => {
             <h1 className="text-center text-2xl font-semibold text-gray-800">{`${firstName} ${lastName}`}</h1>
             <div className="flex justify-center items-center mt-4 text-gray-700">
                 <FontAwesomeIcon icon={faUserFriends} />
-                <h1 className="px-2 text-sm">100000 followers</h1>
+                <h1 className="px-2 text-sm">10000 followers</h1>
+                <FontAwesomeIcon icon={faUserFriends} />
+                <h1 className="px-2 text-sm">20000 following</h1>
+                <Button className="px-4 rounded text-sm font-medium">Follow</Button>
+                {/* <FontAwesomeIcon icon={faUserFriends} />
+                <h1 className="px-2 text-sm">{`${follower}`} followers</h1>
+                <FontAwesomeIcon icon={faUserFriends} />
+                <h1 className="px-2 text-sm">{`${following}`} following</h1> */}
             </div>
         </div>
     )
