@@ -1,8 +1,8 @@
 import {AppProps} from 'next/app'
 import Head from 'next/head'
 import {FC} from 'react'
-import {MockProvider} from '../mock/MockContext'
 import {createGlobalStyle} from 'styled-components'
+import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client'
 import 'tailwindcss/tailwind.css'
 
 const GlobalStyle = createGlobalStyle`
@@ -12,6 +12,11 @@ const GlobalStyle = createGlobalStyle`
   }
 `
 
+const client = new ApolloClient({
+  uri: process.env.NEXT_PUBLIC_API_URL,
+  cache: new InMemoryCache(),
+})
+
 const App: FC<AppProps> = ({Component, pageProps}) => {
   return (
     <>
@@ -19,9 +24,9 @@ const App: FC<AppProps> = ({Component, pageProps}) => {
         <title>KiSS</title>
       </Head>
       <GlobalStyle />
-      <MockProvider>
-        <Component {...pageProps} />
-      </MockProvider>
+      <ApolloProvider client={client}>
+          <Component {...pageProps} />
+      </ApolloProvider>
     </>
   )
 }

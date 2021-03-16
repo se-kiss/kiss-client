@@ -1,24 +1,31 @@
-import {NextPage} from 'next'
-import {FC, useContext} from 'react'
-import {Layout} from '../../../../components'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faTimes, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
+import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {NextPage} from 'next'
+import {useRouter} from 'next/router'
+import {FC} from 'react'
+import {Layout} from '../../../../components'
+import {ArticleForm, VideoForm, MediaFormButtons} from '../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
   MediaFormProvider,
 } from '../../../../lib/useMediaForm'
-import {MediaTypes} from '../../../../mock/data'
-import {MockContext} from '../../../../mock/MockContext'
 import styled from 'styled-components'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {HorizontalLine} from '../../../../components/common'
+import {gql, useMutation} from '@apollo/client'
+import {
+  Mutation,
+  MutationCreateMediaArgs,
+  MediaType,
+} from '../../../../types/generated/graphql'
 
-type TypeButtonProp = {
+type MenuButtonProps = {
   active?: boolean
 }
 
-const TypeButton = styled.div<TypeButtonProp>`
-  background: ${({active}) => (active ? '#ED827B' : 'white')};
-  color: ${({active}) => (active ? 'white' : '#ED827B')};
+const MenuButton = styled.div<MenuButtonProps>`
+  background: ${({active}) => (active ? '#ed827b' : 'white')};
+  color: ${({active}) => (active ? 'white' : '#ed827b')};
 
   &:hover {
     background: #ed827b;
@@ -26,217 +33,125 @@ const TypeButton = styled.div<TypeButtonProp>`
   }
 `
 
-type TagProps = {
-  color?: string
-}
-
-const Tag = styled.div<TagProps>`
-  border-color ${({color}) => (color ? color : 'lightgray')};
-  background: ${({color}) => (color ? color : 'white')};
-`
-
-const OutlinedButton = styled.button`
-  border: 1px solid #ff8a83;
-  color: #ff8a83;
-
-  &:hover {
-    color: white;
-    background: #ff8a83;
-  }
-`
-
 const SideBox: FC = () => {
-  const typeButtons = [
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
+  const formTitle = 'Create Media'
+
+  const mediaTypes = [
     {
-      type: MediaTypes.Article,
+      type: MediaType.Article,
       name: 'Article',
       icon: faNewspaper,
     },
     {
-      type: MediaTypes.Video,
+      type: MediaType.Clip,
       name: 'Video',
       icon: faVideo,
     },
   ]
 
-  const {state: formState, dispatch: dispatchForm} = useMediaForm()
-
   return (
     <div className="px-4 py-6">
-      <h1 className="text-xl text-gray-700 font-bold">Select Media Type</h1>
+      <h1 className="text-xl text-gray-700 font-semibold">{formTitle}</h1>
+
+      <HorizontalLine className="my-4" />
+
+      <h1 className="text-xl text-gray-700 font-semibold">Select Media Type</h1>
 
       <div className="mt-4">
-        {typeButtons.map(({type, name, icon}) => (
-          <TypeButton
-            key={name}
-            active={formState.type === type}
+        {mediaTypes.map(({type, name, icon}) => (
+          <MenuButton
+            key={type}
+            active={type === formState.mediaType}
+            className="rounded p-2 cursor-pointer flex flex-row items-center"
             onClick={() =>
               dispatchForm({
-                type: MediaFormActionTypes.EditType,
-                payload: {
-                  type,
-                },
+                type: MediaFormActionTypes.EditMediaType,
+                payload: {mediaType: type},
               })
             }
-            className="rounded p-2 cursor-pointer flex flex-row items-center"
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
-          </TypeButton>
+          </MenuButton>
         ))}
       </div>
     </div>
   )
 }
 
-const ArticleForm: FC = () => {
-  const {state: formState, dispatch: dispatchForm} = useMediaForm()
-  const {state: mockState} = useContext(MockContext)
-  const {tags} = mockState
-  const {paragraph, paragraphIndex} = formState
-
-  const onEditName = (name) => {
-    dispatchForm({
-      type: MediaFormActionTypes.EditName,
-      payload: {
-        name,
-      },
-    })
+const CREATE_MEDIA = gql`
+  mutation CreateMedia($args: CreateMediaArgs!) {
+    createMedia(args: $args) {
+      _id
+    }
   }
+`
 
-  const onAddParagraph = () => {
-    dispatchForm({
-      type: MediaFormActionTypes.AddParagraph,
-    })
-  }
+type FormProps = {
+  playlistId: string
+}
 
-  const onEditParagraph = (text, index) => {
-    dispatchForm({
-      type: MediaFormActionTypes.EditParagraph,
-      payload: {
-        paragraph: {
-          index,
-          text,
+const Form: FC<FormProps> = ({playlistId}) => {
+  const router = useRouter()
+  const {state: formState} = useMediaForm()
+  const [createMedia] = useMutation<
+    Pick<Mutation, 'createMedia'>,
+    MutationCreateMediaArgs
+  >(CREATE_MEDIA)
+
+  const onCreateClick = () => {
+    const {name, tagIds, mediaType, paragraph} = formState
+
+    createMedia({
+      variables: {
+        args: {
+          playlistId,
+          name,
+          tagIds,
+          type: mediaType,
+          paragraph,
         },
       },
+      update: (cache) => {
+        cache.reset()
+        router.push(`/playlists/${playlistId}/media`)
+      }
     })
   }
 
-  const onRemoveParagraph = (index) => {
-    dispatchForm({
-      type: MediaFormActionTypes.RemoveParagraph,
-      payload: {
-        paragraph: {
-          index,
-        },
-      },
-    })
-  }
-
-  const onFocusParagraph = (index) => {
-    dispatchForm({
-      type: MediaFormActionTypes.FocusParagraph,
-      payload: {
-        paragraph: {
-          index,
-        },
-      },
-    })
-  }
+  const FormComponent = ((type) => {
+    switch (type) {
+      case MediaType.Article:
+        return ArticleForm
+      case MediaType.Clip:
+        return VideoForm
+    }
+  })(formState.mediaType)
 
   return (
     <div>
-      <div>
-        <h3 className="text-md text-gray-700 font-medium mb-2">Name</h3>
-        <input
-          type="text"
-          className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
-          value={formState.name}
-          onChange={(e) => onEditName(e.target.value)}
-        />
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-md text-gray-700 font-medium mb-2">Tags</h3>
-
-        <div className="w-full flex flex-row flex-wrap">
-          {tags.map(({id, name, color}) => (
-            <Tag
-              key={id}
-              color={color}
-              className="rounded my-1 mr-2 px-2 text-sm text-gray-700 font-medium border cursor-pointer"
-            >
-              {name}
-            </Tag>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <h3 className="text-md text-gray-700 font-medium mb-2">Content</h3>
-        {paragraph.map((text, index) => (
-          <div key={`paragraph-${index}`} className="relative my-2 pt-2 pr-1">
-            <textarea
-              rows={8}
-              className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
-              value={text}
-              onChange={(e) => onEditParagraph(e.target.value, index)}
-              onFocus={() => onFocusParagraph(index)}
-            />
-
-            {index !== 0 && paragraphIndex === index && (
-              <OutlinedButton
-                className="absolute w-4 h-4 bg-white top-0 right-0 flex justify-center items-center rounded-full focus:outline-none"
-                onClick={() => onRemoveParagraph(index)}
-              >
-                <FontAwesomeIcon icon={faTimes} size="xs" />
-              </OutlinedButton>
-            )}
-          </div>
-        ))}
-
-        <div className="mt-4">
-          <OutlinedButton
-            className="w-8 h-8 rounded-full focus:outline-none"
-            onClick={onAddParagraph}
-          >
-            <FontAwesomeIcon icon={faPlus} />
-          </OutlinedButton>
-        </div>
-      </div>
-
-      <div className="mt-16 flex flex-row justify-around">
-        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
-          Cancel
-        </OutlinedButton>
-
-        <OutlinedButton className="text-lg font-medium px-8 py-1 rounded focus:outline-none">
-          Create
-        </OutlinedButton>
+      <FormComponent />
+      <div className="py-4">
+        <MediaFormButtons onSubmit={onCreateClick} />
       </div>
     </div>
   )
 }
 
-const Form: FC = () => {
-  const {state: formState} = useMediaForm()
-
-  switch (formState.type) {
-    case MediaTypes.Article:
-      return <ArticleForm />
-    case MediaTypes.Video:
-      return null
-    default:
-      return null
-  }
-}
-
 const MediaForm: NextPage = () => {
+  const router = useRouter()
+  const {id: playlistId} = router.query
+
+  if (!playlistId) {
+    return <h1>Loading...</h1>
+  }
+
   return (
     <MediaFormProvider>
       <Layout SideComponent={SideBox}>
-        <div className="w-10/12 px-10 py-6 mt-8 mx-auto bg-white rounded-xl shadow-xl">
-          <Form />
+        <div className="w-10/12 mt-8 mx-auto bg-white rounded-xl shadow-xl">
+          <Form playlistId={playlistId as string} />
         </div>
       </Layout>
     </MediaFormProvider>
