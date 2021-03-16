@@ -1,8 +1,13 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
-import {Layout, AuthModal, CommentSidebar} from '../../../../../components'
-import {HorizontalLine, OutlinedButton, Tag} from '../../../../../components/common'
+import {Layout, AuthModal} from '../../../../../components'
+import {
+  HorizontalLine,
+  OutlinedButton,
+  Tag,
+} from '../../../../../components/common'
+import {CommentSidebar} from '../../../../../components/Comment' 
 import useModal, {ModalActionTypes} from '../../../../../lib/useModal'
 import useSidebar, {SidebarActionTypes} from '../../../../../lib/useSidebar'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -125,7 +130,7 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchSidebar} = useSidebar()
   const {
-    playlist: {user: owner},
+    playlist: {user: owner}
   } = media
 
   const onAuthModalShow = () => {
@@ -153,7 +158,8 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
         dispatchSidebar({
           type: SidebarActionTypes.ShowSidebar,
           payload: {
-            Content: CommentSidebar,
+            // eslint-disable-next-line react/display-name
+            Content: () => <CommentSidebar media={media} />,
           },
         })
       },

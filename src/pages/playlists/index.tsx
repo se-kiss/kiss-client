@@ -131,6 +131,7 @@ const Playlists: NextPage = () => {
     return <h1>Loading...</h1>
   }
 
+  console.log(data)
   const {playlists} = data
 
   return (
