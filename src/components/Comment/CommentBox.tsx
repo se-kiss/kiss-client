@@ -44,7 +44,7 @@ const CommentBox: FC<CommentBoxProps> = ({media}) => {
       },
       update: (cache) => {
         cache.reset()
-      }
+      },
     })
 
     setText('')
@@ -57,6 +57,9 @@ const CommentBox: FC<CommentBoxProps> = ({media}) => {
         type="text"
         className="w-full border border-gray-300 pl-2 py-1 text-lg rounded focus:outline-none"
         value={text}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onSubmit()
+        }}
         onChange={(e) => setText(e.target.value)}
       />
 

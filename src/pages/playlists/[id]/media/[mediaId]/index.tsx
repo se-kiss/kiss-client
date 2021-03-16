@@ -7,7 +7,7 @@ import {
   OutlinedButton,
   Tag,
 } from '../../../../../components/common'
-import {CommentSidebar} from '../../../../../components/Comment' 
+import {CommentSidebar} from '../../../../../components/Comment'
 import useModal, {ModalActionTypes} from '../../../../../lib/useModal'
 import useSidebar, {SidebarActionTypes} from '../../../../../lib/useSidebar'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -16,11 +16,7 @@ import {
   faArrowDown,
   faPencilAlt,
 } from '@fortawesome/free-solid-svg-icons'
-import {
-  faComment,
-  faBookmark,
-  faTrashAlt,
-} from '@fortawesome/free-regular-svg-icons'
+import {faComment, faTrashAlt} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
 import {gql, useMutation, useQuery} from '@apollo/client'
 import {
@@ -130,7 +126,7 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchSidebar} = useSidebar()
   const {
-    playlist: {user: owner}
+    playlist: {user: owner},
   } = media
 
   const onAuthModalShow = () => {
@@ -163,10 +159,6 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
           },
         })
       },
-    },
-    {
-      name: 'Bookmark',
-      icon: faBookmark,
     },
   ]
 
@@ -220,7 +212,8 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
       <HorizontalLine className="my-4" />
 
       <div>
-        {mediaMenus.map(({name, icon, onClick}) => (
+        {/* TODO: replace hardcord */}
+        {(owner._id === '605106b54d80c94de1f2d1d3') && mediaMenus.map(({name, icon, onClick}) => (
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
