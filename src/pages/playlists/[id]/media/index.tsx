@@ -8,7 +8,7 @@ import {
   OutlinedButton,
 } from '../../../../components/common'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faPlus, faEdit, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 import usePlaylistForm, {
   PlaylistFormActionType,
   PlaylistFormType,
@@ -162,13 +162,6 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
       icon: faPlus,
       onClick: () => {
         router.push(`/playlists/${playlistId}/media/new`)
-      },
-    },
-    {
-      name: 'Edit Media',
-      icon: faEdit,
-      onClick: () => {
-        alert('Edit Media')
       },
     },
     {

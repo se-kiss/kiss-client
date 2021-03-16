@@ -1,17 +1,23 @@
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import {faVideo} from '@fortawesome/free-solid-svg-icons'
 import {NextPage} from 'next'
+import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
-import {ArticleForm, VideoForm} from '../../../../components/MediaForm'
+import {ArticleForm, VideoForm, MediaFormButtons} from '../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
   MediaFormProvider,
 } from '../../../../lib/useMediaForm'
-import {MediaType} from '../../../../types/generated/graphql'
 import styled from 'styled-components'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import { HorizontalLine } from '../../../../components/common'
+import {HorizontalLine} from '../../../../components/common'
+import {gql, useMutation} from '@apollo/client'
+import {
+  Mutation,
+  MutationCreateMediaArgs,
+  MediaType,
+} from '../../../../types/generated/graphql'
 
 type MenuButtonProps = {
   active?: boolean
@@ -74,23 +80,78 @@ const SideBox: FC = () => {
   )
 }
 
-const Form: FC = () => {
-  const {state: formState} = useMediaForm()
-
-  switch (formState.mediaType) {
-    case MediaType.Article:
-      return <ArticleForm />
-    case MediaType.Clip:
-      return <VideoForm />
+const CREATE_MEDIA = gql`
+  mutation CreateMedia($args: CreateMediaArgs!) {
+    createMedia(args: $args) {
+      _id
+    }
   }
+`
+
+type FormProps = {
+  playlistId: string
+}
+
+const Form: FC<FormProps> = ({playlistId}) => {
+  const router = useRouter()
+  const {state: formState} = useMediaForm()
+  const [createMedia] = useMutation<
+    Pick<Mutation, 'createMedia'>,
+    MutationCreateMediaArgs
+  >(CREATE_MEDIA)
+
+  const onCreateClick = () => {
+    const {name, tagIds, mediaType, paragraph} = formState
+
+    createMedia({
+      variables: {
+        args: {
+          playlistId,
+          name,
+          tagIds,
+          type: mediaType,
+          paragraph,
+        },
+      },
+      update: (cache) => {
+        cache.reset()
+        router.push(`/playlists/${playlistId}/media`)
+      }
+    })
+  }
+
+  const FormComponent = ((type) => {
+    switch (type) {
+      case MediaType.Article:
+        return ArticleForm
+      case MediaType.Clip:
+        return VideoForm
+    }
+  })(formState.mediaType)
+
+  return (
+    <div>
+      <FormComponent />
+      <div className="py-4">
+        <MediaFormButtons onSubmit={onCreateClick} />
+      </div>
+    </div>
+  )
 }
 
 const MediaForm: NextPage = () => {
+  const router = useRouter()
+  const {id: playlistId} = router.query
+
+  if (!playlistId) {
+    return <h1>Loading...</h1>
+  }
+
   return (
     <MediaFormProvider>
       <Layout SideComponent={SideBox}>
         <div className="w-10/12 mt-8 mx-auto bg-white rounded-xl shadow-xl">
-          <Form />
+          <Form playlistId={playlistId as string} />
         </div>
       </Layout>
     </MediaFormProvider>
