@@ -1,5 +1,5 @@
 import {FC} from 'react'
-import {OutlinedButton} from '../'
+import {OutlinedButton} from '../common'
 
 const MediaFormButtons: FC = () => {
   return (

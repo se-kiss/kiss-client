@@ -109,8 +109,16 @@ const GET_PLAYLISTS = gql`
     playlists {
       _id
       name
-      tagIds
-      ownerId
+      tags {
+        _id
+        name
+        color
+      }
+      user {
+        _id
+        firstName
+        lastName
+      }
       _updatedAt
     }
   }

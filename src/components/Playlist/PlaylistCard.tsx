@@ -1,76 +1,20 @@
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Tag} from '../common'
-import {
-  Playlist,
-  Query,
-  QueryTagArgs,
-  QueryUserArgs,
-} from '../../types/generated/graphql'
-import {gql, useQuery} from '@apollo/client'
+import {Playlist} from '../../types/generated/graphql'
 
 type PlaylistCardProps = {
   playlist: Playlist
 }
 
-const GET_TAG = gql`
-  query GetTag($args: GetTagsArgs) {
-    tag(args: $args) {
-      _id
-      name
-      color
-    }
-  }
-`
-
-const GET_OWNER = gql`
-  query GetOwner($args: GetUsersArgs) {
-    user(args: $args) {
-      _id
-      firstName
-      lastName
-    }
-  }
-`
-
 const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
   const router = useRouter()
-  const {_id, name, _updatedAt, tagIds, ownerId} = playlist
+  const {_id, name, _updatedAt, tags, user: owner} = playlist
   const updatedDate = new Date(_updatedAt)
   const formatedDate = Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
   }).format(updatedDate)
-
-  const {loading: tagLoading, data: tagData} = useQuery<
-    Pick<Query, 'tag'>,
-    QueryTagArgs
-  >(GET_TAG, {
-    variables: {
-      args: {
-        ids: tagIds,
-      },
-    },
-  })
-
-  const {loading: userLoading, data: userData} = useQuery<
-    Pick<Query, 'user'>,
-    QueryUserArgs
-  >(GET_OWNER, {
-    variables: {
-      args: {
-        ids: [ownerId],
-      },
-    },
-  })
-
-  if (tagLoading || userLoading) {
-    return <h1>Loading...</h1>
-  }
-
-  const {tag: tags} = tagData
-  const {user} = userData
-  const owner = user[0]
 
   return (
     <div

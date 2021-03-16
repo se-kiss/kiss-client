@@ -19,8 +19,8 @@ import {gql, useQuery, useMutation} from '@apollo/client'
 import {
   Mutation,
   MutationDeletePlaylistArgs,
+  Playlist,
   Query,
-  QueryMediaArgs,
   QueryPlaylistsArgs,
 } from '../../../../types/generated/graphql'
 import {faTrashAlt} from '@fortawesome/free-regular-svg-icons'
@@ -34,17 +34,6 @@ const MenuButton = styled.div`
   &:hover {
     background: #ed827b;
     color: white;
-  }
-`
-
-const GET_PLAYLIST = gql`
-  query GetPlaylist($args: GetPlaylistArgs) {
-    playlists(args: $args) {
-      _id
-      name
-      description
-      tagIds
-    }
   }
 `
 
@@ -118,34 +107,54 @@ const ConfirmDeletePlaylist: FC = () => {
   )
 }
 
-const SideBox: FC = () => {
+const GET_PLAYLIST = gql`
+  query GetPlaylist($args: GetPlaylistArgs) {
+    playlists(args: $args) {
+      _id
+      name
+      description
+      tags {
+        _id
+        name
+        color
+      }
+      media {
+        _id
+        name
+        description
+        tags {
+          _id
+          name
+          color
+        }
+        playlist {
+          _id
+          user {
+            _id
+            firstName
+            lastName
+          }
+        }
+        type
+        paragraph
+        _updatedAt
+      }
+    }
+  }
+`
+
+type SideBoxProps = {
+  playlist: Playlist
+}
+
+const SideBox: FC<SideBoxProps> = ({playlist}) => {
   const router = useRouter()
   const {id: playlistId} = router.query
 
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
 
-  if (!playlistId) {
-    return <h1>Loading...</h1>
-  }
-
-  const {loading: playlistLoading, data: playlistData} = useQuery<
-    Pick<Query, 'playlists'>,
-    QueryPlaylistsArgs
-  >(GET_PLAYLIST, {
-    variables: {
-      args: {
-        ids: [playlistId as string],
-      },
-    },
-  })
-
-  if (playlistLoading) {
-    return <h1>Loading...</h1>
-  }
-
-  const {playlists} = playlistData
-  const {name, description} = playlists[0]
+  const {name, description, tags} = playlist
 
   const menuButtons = [
     {
@@ -196,33 +205,15 @@ const SideBox: FC = () => {
     },
   ]
 
-  const tags = [
-    {
-      id: 0,
-      name: 'Science',
-      color: '#ff934f',
-    },
-    {
-      id: 1,
-      name: 'Art',
-      color: '#91F5AD',
-    },
-    {
-      id: 2,
-      name: 'Japanese',
-      color: '#AEC5EB',
-    },
-  ]
-
   return (
     <div className="px-4 py-6">
       <div>
         <h1 className="text-xl text-gray-700 font-bold">{name}</h1>
 
         <div className="flex flex-row flex-wrap items-center mt-1">
-          {tags.map(({id, name, color}) => (
+          {tags.map(({_id, name, color}) => (
             <Tag
-              key={id}
+              key={_id}
               color={color}
               className="px-1 text-xs text-gray-700 mt-1 mr-1"
             >
@@ -252,22 +243,7 @@ const SideBox: FC = () => {
   )
 }
 
-const GET_MEDIA = gql`
-  query GetMedia($args: GetMediaArgs) {
-    media(args: $args) {
-      _id
-      playlistId
-      name
-      description
-      tagIds
-      type
-      paragraph
-      _updatedAt
-    }
-  }
-`
-
-const Playlist: NextPage = () => {
+const PlaylistPage: NextPage = () => {
   const router = useRouter()
   const {id: playlistId} = router.query
 
@@ -275,27 +251,26 @@ const Playlist: NextPage = () => {
     return <h1>Loading...</h1>
   }
 
-  const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(
-    GET_MEDIA,
-    {
-      variables: {
-        args: {
-          filter: {
-            playlistId: playlistId as string,
-          },
-        },
+  const {loading, data} = useQuery<
+    Pick<Query, 'playlists'>,
+    QueryPlaylistsArgs
+  >(GET_PLAYLIST, {
+    variables: {
+      args: {
+        ids: [playlistId as string],
       },
-    }
-  )
+    },
+  })
 
   if (loading) {
     return <h1>Loading...</h1>
   }
 
-  const {media} = data
+  const {playlists} = data
+  const {media} = playlists[0]
 
   return (
-    <Layout SideComponent={SideBox}>
+    <Layout SideComponent={() => <SideBox playlist={playlists[0]} />}>
       <div className="px-10 mt-8 mx-auto">
         {media.map((mediaOne) => (
           <MediaCard key={mediaOne._id} media={mediaOne} />
@@ -305,4 +280,4 @@ const Playlist: NextPage = () => {
   )
 }
 
-export default Playlist
+export default PlaylistPage
