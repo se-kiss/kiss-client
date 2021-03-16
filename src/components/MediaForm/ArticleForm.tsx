@@ -1,8 +1,8 @@
 import React, {FC} from 'react'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
-import {MediaFormHeader, MediaFormButtons} from './'
+import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons'
+import {faPlus, faTimes} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
 const OutlinedButton = styled.button`
@@ -95,8 +95,6 @@ const ArticleForm: FC = () => {
           </OutlinedButton>
         </div>
       </div>
-
-      <MediaFormButtons />
     </div>
   )
 }

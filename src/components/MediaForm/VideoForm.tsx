@@ -1,6 +1,6 @@
 import {FC, createRef} from 'react'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
-import {MediaFormHeader, MediaFormButtons} from './'
+import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUpload} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
@@ -56,8 +56,6 @@ const VideoForm: FC = () => {
             onChange={(e) => onEditDescription(e.target.value)}
           />
         </div>
-
-        <MediaFormButtons />
       </div>
     </>
   )

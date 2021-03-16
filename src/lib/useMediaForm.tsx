@@ -6,38 +6,52 @@ import {
   FC,
   Reducer,
 } from 'react'
-import {MediaTypes} from '../mock/data'
+import {MediaType} from '../types/generated/graphql'
+
+enum MediaFormType {
+  Create = 'CREATE',
+  Edit = 'EDIT',
+}
 
 type MediaFormState = {
-  type: MediaTypes
+  type: MediaFormType
+  mediaType: MediaType
   name: string
   paragraph?: string[]
   paragraphIndex: number
   description?: string
+  tagIds: string[]
 }
 
 const initialState: MediaFormState = {
-  type: MediaTypes.Article,
+  type: MediaFormType.Create,
+  mediaType: MediaType.Article,
   name: '',
   paragraph: [''],
   paragraphIndex: 0,
   description: '',
+  tagIds: [],
 }
 
 export enum MediaFormActionTypes {
-  EditType = 'EDIT_TYPE',
+  EditMediaType = 'EDIT_MEDIA_TYPE',
   EditName = 'EDIT_NAME',
+  EditTagIds = 'EDIT_TAG_IDS',
+  SetParagraph = 'SET_PARAGRAPH',
   AddParagraph = 'ADD_PARAGRAPH',
   EditParagraph = 'EDIT_PARAGRAPH',
   RemoveParagraph = 'REMOVE_PARAGRAPH',
   FocusParagraph = 'FOCUS_PARAGRAPH',
   EditDescription = 'EDIT_DESCRIPTION',
+  SetForm = 'SET_FORM',
+  ResetForm = 'RESET_FORM',
 }
 
 type MediaFormPayload = Partial<Omit<MediaFormState, 'paragraph'>> & {
   paragraph?: {
     index?: number
     text?: string
+    value?: string[]
   }
 }
 
@@ -48,11 +62,14 @@ type MediaFormAction = {
 
 const reducer: Reducer<MediaFormState, MediaFormAction> = (state, action) => {
   switch (action.type) {
-    case MediaFormActionTypes.EditType:
-      return {...state, type: action.payload.type}
+    case MediaFormActionTypes.EditMediaType:
+      return {...state, mediaType: action.payload.mediaType}
 
     case MediaFormActionTypes.EditName:
       return {...state, name: action.payload.name}
+
+    case MediaFormActionTypes.EditTagIds:
+      return {...state, tagIds: action.payload.tagIds}
 
     case MediaFormActionTypes.AddParagraph: {
       const paragraph = [...state.paragraph, '']
@@ -95,6 +112,21 @@ const reducer: Reducer<MediaFormState, MediaFormAction> = (state, action) => {
         ...state,
         description: action.payload.description,
       }
+
+    case MediaFormActionTypes.SetForm: {
+      const {name, description, tagIds, mediaType, paragraph} = action.payload
+      return {
+        ...state,
+        name,
+        description,
+        tagIds,
+        mediaType,
+        paragraph: paragraph.value,
+      }
+    }
+
+    case MediaFormActionTypes.ResetForm:
+      return initialState
 
     default:
       return state
