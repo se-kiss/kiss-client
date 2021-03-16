@@ -20,6 +20,7 @@ import {
   QueryUserArgs,
 } from '../../types/generated/graphql'
 import {ProfileCard} from '../../components/Profile'
+import {PlaylistCard} from '../../components/Playlist'
 
 
 
@@ -37,6 +38,21 @@ const GET_USER = gql`
       _id
       firstName
       lastName
+      playlists {
+        _id
+        name
+        tags {
+          _id
+          name
+          color
+        }
+        user {
+          _id
+          firstName
+          lastName
+        }
+        _updatedAt
+      }
     }
   }
 `
@@ -65,6 +81,11 @@ const GET_USER = gql`
           <ProfileCard key={currentUser._id} user={currentUser} />
         ))} */}
         <ProfileCard key={user[0]._id} user={user[0]} />
+        <div className="px-10 mt-8 mx-auto">
+        {user[0].playlists.map((playlist) => (
+          <PlaylistCard key={playlist._id} playlist={playlist} />
+        ))}
+        </div>
       </div>
       </Layout>
     )
