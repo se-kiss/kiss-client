@@ -1,10 +1,10 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
-import {Layout, AuthModal, CommentSidebar} from '../../../../components'
-import {HorizontalLine, OutlinedButton} from '../../../../components/common'
-import useModal, {ModalActionTypes} from '../../../../lib/useModal'
-import useSidebar, {SidebarActionTypes} from '../../../../lib/useSidebar'
+import {Layout, AuthModal, CommentSidebar} from '../../../../../components'
+import {HorizontalLine, OutlinedButton, Tag} from '../../../../../components/common'
+import useModal, {ModalActionTypes} from '../../../../../lib/useModal'
+import useSidebar, {SidebarActionTypes} from '../../../../../lib/useSidebar'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {
   faArrowUp,
@@ -17,13 +17,15 @@ import {
   faTrashAlt,
 } from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
-import {gql, useQuery} from '@apollo/client'
+import {gql, useMutation, useQuery} from '@apollo/client'
 import {
   Media,
   MediaType,
+  Mutation,
+  MutationDeleteMediaArgs,
   Query,
   QueryMediaArgs,
-} from '../../../../types/generated/graphql'
+} from '../../../../../types/generated/graphql'
 
 const Button = styled.button`
   background: #ed827b;
@@ -44,73 +46,82 @@ const MenuButton = styled.div`
   }
 `
 
-// const ConfirmDeletePlaylist: FC = () => {
-//   const router = useRouter()
-//   const {id: playlistId} = router.query
+const DELETE_MEDIA = gql`
+  mutation DeleteMedia($args: DeleteMediaArgs!) {
+    deleteMedia(args: $args) {
+      _id
+    }
+  }
+`
 
-//   const {dispatch: dispatchModal} = useModal()
-//   const [deletePlaylist] = useMutation<
-//     Pick<Mutation, 'deletePlaylist'>,
-//     MutationDeletePlaylistArgs
-//   >(DELETE_PLAYLIST)
+const ConfirmDeleteMedia: FC = () => {
+  const router = useRouter()
+  const {id: playlistId, mediaId} = router.query
 
-//   if (!playlistId) {
-//     return <h1>Loading...</h1>
-//   }
+  const {dispatch: dispatchModal} = useModal()
+  const [deleteMedia] = useMutation<
+    Pick<Mutation, 'deleteMedia'>,
+    MutationDeleteMediaArgs
+  >(DELETE_MEDIA)
 
-//   const closeModal = () =>
-//     dispatchModal({
-//       type: ModalActionTypes.CloseModal,
-//     })
+  if (!playlistId || !mediaId) {
+    return <h1>Loading...</h1>
+  }
 
-//   const onModalClose = () => {
-//     closeModal()
-//   }
+  const closeModal = () =>
+    dispatchModal({
+      type: ModalActionTypes.CloseModal,
+    })
 
-//   const onConfirm = () => {
-//     deletePlaylist({
-//       variables: {
-//         args: {
-//           _id: playlistId as string,
-//         },
-//       },
-//       update: (cache) => {
-//         cache.reset()
-//         router.push('/playlists')
-//       },
-//     })
-//     closeModal()
-//   }
+  const onModalClose = () => {
+    closeModal()
+  }
 
-//   return (
-//     <div className="p-8">
-//       <h1 className="w-full h-60 flex-1 text-2xl text-gray-700 text-center font-medium">
-//         Delete This Media ?
-//       </h1>
+  const onConfirm = () => {
+    deleteMedia({
+      variables: {
+        args: {
+          _id: mediaId as string,
+        },
+      },
+      update: (cache) => {
+        cache.reset()
+        router.push(`/playlists/${playlistId}/media`)
+      },
+    })
+    closeModal()
+  }
 
-//       <div className="flex flex-row justify-around">
-//         <OutlinedButton
-//           className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
-//           onClick={onModalClose}
-//         >
-//           Cancel
-//         </OutlinedButton>
-//         <OutlinedButton
-//           className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
-//           onClick={onConfirm}
-//         >
-//           Confirm
-//         </OutlinedButton>
-//       </div>
-//     </div>
-//   )
-// }
+  return (
+    <div className="p-8">
+      <h1 className="w-full h-60 flex-1 text-2xl text-gray-700 text-center font-medium">
+        Delete This Media ?
+      </h1>
+
+      <div className="flex flex-row justify-around">
+        <OutlinedButton
+          className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
+          onClick={onModalClose}
+        >
+          Cancel
+        </OutlinedButton>
+        <OutlinedButton
+          className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
+          onClick={onConfirm}
+        >
+          Confirm
+        </OutlinedButton>
+      </div>
+    </div>
+  )
+}
 
 type SideBoxProps = {
   media: Media
 }
 
 const SideBox: FC<SideBoxProps> = ({media}) => {
+  const router = useRouter()
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchSidebar} = useSidebar()
   const {
@@ -158,14 +169,17 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
       name: 'Edit',
       icon: faPencilAlt,
       onClick: () => {
-        alert('Edit Media')
+        router.push(`/playlists/${media.playlist._id}/media/${media._id}/edit`)
       },
     },
     {
       name: 'Delete',
       icon: faTrashAlt,
       onClick: () => {
-        alert('Delete Media')
+        dispatchModal({
+          type: ModalActionTypes.ShowModal,
+          payload: {Content: ConfirmDeleteMedia},
+        })
       },
     },
   ]
@@ -229,10 +243,23 @@ const MediaComponent: FC<MediaComponentProps> = ({media}) => {
 }
 
 const Article: FC<MediaComponentProps> = ({media}) => {
-  const {name, paragraph} = media
+  const {name, paragraph, tags} = media
   return (
     <div className="bg-white w-10/12 h-auto px-10 pt-6 pb-20 rounded-xl shadow-xl">
       <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
+
+      <div className="flex flex-row flex-wrap items-center mt-1">
+        {tags.map(({_id, name, color}) => (
+          <Tag
+            key={_id}
+            color={color}
+            className="px-1 text-xs text-gray-700 mt-1 mr-1"
+          >
+            {name}
+          </Tag>
+        ))}
+      </div>
+
       {paragraph.map((text, index) => (
         <p
           key={`paragraph-${index}`}
@@ -266,6 +293,11 @@ const GET_MEDIA = gql`
       description
       paragraph
       type
+      tags {
+        _id
+        name
+        color
+      }
       playlist {
         _id
         user {
