@@ -1,6 +1,6 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
-import {FC} from 'react'
+import {FC, useEffect, useState} from 'react'
 import {Layout, AuthModal} from '../../../../../components'
 import {
   HorizontalLine,
@@ -15,6 +15,8 @@ import {
   faArrowUp,
   faArrowDown,
   faPencilAlt,
+  faPlay,
+  faPause,
 } from '@fortawesome/free-solid-svg-icons'
 import {faComment, faTrashAlt} from '@fortawesome/free-regular-svg-icons'
 import styled from 'styled-components'
@@ -213,16 +215,17 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
 
       <div>
         {/* TODO: replace hardcord */}
-        {(owner._id === '605106b54d80c94de1f2d1d3') && mediaMenus.map(({name, icon, onClick}) => (
-          <MenuButton
-            key={name}
-            className="rounded p-2 cursor-pointer flex flex-row items-center"
-            onClick={true ? onClick : onAuthModalShow}
-          >
-            <FontAwesomeIcon icon={icon} />
-            <span className="text-md font-medium ml-4">{name}</span>
-          </MenuButton>
-        ))}
+        {owner._id === '605106b54d80c94de1f2d1d3' &&
+          mediaMenus.map(({name, icon, onClick}) => (
+            <MenuButton
+              key={name}
+              className="rounded p-2 cursor-pointer flex flex-row items-center"
+              onClick={true ? onClick : onAuthModalShow}
+            >
+              <FontAwesomeIcon icon={icon} />
+              <span className="text-md font-medium ml-4">{name}</span>
+            </MenuButton>
+          ))}
       </div>
     </div>
   )
@@ -238,6 +241,8 @@ const MediaComponent: FC<MediaComponentProps> = ({media}) => {
       return <Article media={media} />
     case MediaType.Clip:
       return <Video media={media} />
+    case MediaType.Podcast:
+      return <Podcast media={media} />
   }
 }
 
@@ -272,12 +277,78 @@ const Article: FC<MediaComponentProps> = ({media}) => {
 }
 
 const Video: FC<MediaComponentProps> = ({media}) => {
-  const {name, description} = media
+  const {name, description, tags} = media
   return (
     <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
       <iframe className="w-full h-80 rounded-t-xl" />
       <div className="px-10 pt-4 pb-8">
         <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
+
+        <div className="flex flex-row flex-wrap items-center mt-1">
+          {tags.map(({_id, name, color}) => (
+            <Tag
+              key={_id}
+              color={color}
+              className="px-1 text-xs text-gray-700 mt-1 mr-1"
+            >
+              {name}
+            </Tag>
+          ))}
+        </div>
+
+        <p className="text-md text-gray-700 font-normal mt-2">{description}</p>
+      </div>
+    </div>
+  )
+}
+
+const Podcast: FC<MediaComponentProps> = ({media}) => {
+  const {name, description, tags} = media
+  // TODO: replace podcast url
+  const [audio] = useState(
+    new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')
+  )
+  const [playing, setPlaying] = useState(false)
+
+  useEffect(() => {
+    playing ? audio.play() : audio.pause()
+  }, [playing])
+
+  useEffect(() => {
+    audio.addEventListener('ended', () => setPlaying(false))
+
+    return () => {
+      audio.removeEventListener('ended', () => setPlaying(false))
+    }
+  }, [])
+
+  return (
+    <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
+      <div className="h-36 bg-white border-2 border-red-400 rounded-t-xl flex flex-row justify-around items-center p-4">
+        <OutlinedButton
+          className="rounded-full w-20 h-20 focus:outline-none"
+          onClick={() => setPlaying(!playing)}
+        >
+          <FontAwesomeIcon icon={!playing ? faPlay : faPause} size="2x" />
+        </OutlinedButton>
+
+        <div className="rounded-xl border border-red-400 bg-red-400 w-96 h-2" />
+      </div>
+      <div className="px-10 pt-4 pb-8">
+        <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
+
+        <div className="flex flex-row flex-wrap items-center mt-1">
+          {tags.map(({_id, name, color}) => (
+            <Tag
+              key={_id}
+              color={color}
+              className="px-1 text-xs text-gray-700 mt-1 mr-1"
+            >
+              {name}
+            </Tag>
+          ))}
+        </div>
+
         <p className="text-md text-gray-700 font-normal mt-2">{description}</p>
       </div>
     </div>
