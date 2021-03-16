@@ -1,64 +1,32 @@
 import {useRouter} from 'next/router'
-import {FC, useContext} from 'react'
-import {MockContext} from '../../mock/MockContext'
-import {PlaylistType, MediaTypes} from '../../mock/data'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faNewspaper, faVideo} from '@fortawesome/free-solid-svg-icons'
-import styled from 'styled-components'
-
-type TagProps = {
-  color?: string
-}
-
-const Tag = styled.div<TagProps>`
-  background: ${({color}) => (color ? color : 'white')};
-`
+import {FC} from 'react'
+import {Tag} from '../common'
+import {Playlist} from '../../types/generated/graphql'
 
 type PlaylistCardProps = {
-  playlist: PlaylistType
+  playlist: Playlist
 }
 
 const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
   const router = useRouter()
-  const {state} = useContext(MockContext)
-  const {users, tags: mockTags, media} = state
-
-  const {id, name, ownerId, tagIds} = playlist
-  const owner = users.find((user) => user.id === ownerId)
-  const tags = tagIds.map((tagId) =>
-    mockTags.find((mockTag) => mockTag.id === tagId)
-  )
-
-  const types = media
-    .filter((mediaOne) => mediaOne.playlistId === id)
-    .map(({type}) => {
-      const icon = ((type) => {
-        switch (type) {
-          case MediaTypes.Article:
-            return faNewspaper
-          case MediaTypes.Video:
-            return faVideo
-        }
-      })(type)
-      
-      return {type, icon}
-    })
-
-  const onCardClick = () => {
-    router.push(`/playlists/${id}/media`)
-  }
+  const {_id, name, _updatedAt, tags, user: owner} = playlist
+  const updatedDate = new Date(_updatedAt)
+  const formatedDate = Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+  }).format(updatedDate)
 
   return (
     <div
       className="bg-white w-3/4 rounded-lg shadow-xl p-4 my-8 mx-auto cursor-pointer"
-      onClick={onCardClick}
+      onClick={() => router.push(`/playlists/${_id}/media`)}
     >
       <div className="flex flex-row items-center">
         <div className="w-8 h-8 rounded-full bg-red-400 mr-4" />
 
         <div>
-          <h2 className="text-sm text-gray-700 font-medium">{owner.name}</h2>
-          <h4 className="text-xs text-gray-700 font-normal">Feb 2</h4>
+          <h2 className="text-sm text-gray-700 font-medium">{`${owner.firstName} ${owner.lastName}`}</h2>
+          <h4 className="text-xs text-gray-700 font-normal">{formatedDate}</h4>
         </div>
       </div>
 
@@ -66,24 +34,18 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
         <h1 className="text-xl text-gray-700 font-medium">{name}</h1>
 
         <div className="flex flex-row flex-wrap items-center">
-          {tags.map(({id, name, color}) => (
+          {tags.map(({_id, name, color}) => (
             <Tag
-              key={id}
+              key={_id}
               color={color}
-              className="rounded my-2 mr-2 px-2 py-1 text-gray-700 text-xs font-medium"
+              className="p-1 text-xs text-gray-700 mt-3 mr-3"
             >
               {name}
             </Tag>
           ))}
         </div>
 
-        <div className="flex flex-row flex-wrap items-center">
-          {types.map(({type, icon}) => (
-            <div key={type} className="rounded my-2 mr-1 px-2 ">
-              <FontAwesomeIcon icon={icon} className="text-red-400" />
-            </div>
-          ))}
-        </div>
+        <div className="flex flex-row flex-wrap items-center"></div>
       </div>
     </div>
   )

@@ -1,19 +1,73 @@
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import useModal, {ModalActionTypes} from '../../lib/useModal'
-import usePlaylistForm, {PlaylistFormProvider} from '../../lib/usePlaylistForm'
-import {OutlinedButton} from '../'
+import usePlaylistForm, {
+  PlaylistFormActionType,
+  PlaylistFormType,
+} from '../../lib/usePlaylistForm'
+import {OutlinedButton} from '../common'
+import {gql, useMutation} from '@apollo/client'
+import {
+  Mutation,
+  MutationCreatePlaylistArgs,
+  MutationUpdatePlaylistArgs,
+} from '../../types/generated/graphql'
 
+const CREATE_PLAYLIST = gql`
+  mutation CreatePlaylist($args: CreatePlaylistArgs!) {
+    createPlaylist(args: $args) {
+      _id
+      name
+      ownerId
+      description
+      tagIds
+      _createdAt
+      _updatedAt
+    }
+  }
+`
+
+const UPDATE_PLAYLIST = gql`
+  mutation UpdatePlaylist($args: UpdatePlaylistArgs!) {
+    updatePlaylist(args: $args) {
+      _id
+      name
+      ownerId
+      description
+      tagIds
+      _createdAt
+      _updatedAt
+    }
+  }
+`
 
 const Form: FC = () => {
   const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()
   const {dispatch: dispatchModal} = useModal()
 
+  const [createPlaylist] = useMutation<
+    Pick<Mutation, 'createPlaylist'>,
+    MutationCreatePlaylistArgs
+  >(CREATE_PLAYLIST)
+
+  const [updatePlaylist] = useMutation<
+    Pick<Mutation, 'updatePlaylist'>,
+    MutationUpdatePlaylistArgs
+  >(UPDATE_PLAYLIST)
+
+  const formTitle = ((type) => {
+    switch (type) {
+      case PlaylistFormType.Create:
+        return 'Create Playlist'
+      case PlaylistFormType.Edit:
+        return 'Edit Playlist'
+    }
+  })(formState.type)
+
   const clearForm = () =>
     dispatchForm({
-      name: '',
-      description: '',
+      type: PlaylistFormActionType.ResetForm,
     })
 
   const closeModal = () =>
@@ -27,14 +81,47 @@ const Form: FC = () => {
   }
 
   const onPlaylistCreate = () => {
-    closeModal()
-    clearForm()
-    router.push('/playlists/1/media')
+    const {name, description} = formState
+    // TODO: Replace hardcode with userId and remove tagIds from playlist
+    createPlaylist({
+      variables: {
+        args: {
+          name,
+          description,
+          ownerId: '604ef8ddb20501a019d40e23',
+          tagIds: ['604ef720854630484edc8c3e'],
+        },
+      },
+      update: (cache, {data}) => {
+        cache.reset()
+        
+        const {_id} = data.createPlaylist
+        router.push(`/playlists/${_id}/media`)
+      },
+    })
+    onModalClose()
+  }
+
+  const onPlaylistUpdate = () => {
+    const {id: _id, name, description} = formState
+    updatePlaylist({
+      variables: {
+        args: {
+          _id,
+          name,
+          description,
+        }
+      },
+      update: (cache) => {
+        cache.reset()
+      }
+    })
+    onModalClose()
   }
 
   return (
     <div className="flex-1 p-8">
-      <h1 className="text-2xl text-gray-700 font-semibold">Create Playlist</h1>
+      <h1 className="text-2xl text-gray-700 font-semibold">{formTitle}</h1>
 
       <div className="mt-4">
         <h3 className="text-lg text-gray-700 font-medium mb-2">Name</h3>
@@ -42,7 +129,12 @@ const Form: FC = () => {
           type="text"
           name="name"
           value={formState.name}
-          onChange={(e) => dispatchForm({[e.target.name]: e.target.value})}
+          onChange={(e) =>
+            dispatchForm({
+              type: PlaylistFormActionType.ModifyForm,
+              payload: {[e.target.name]: e.target.value},
+            })
+          }
           className="w-full border border-gray-300 pl-2 py-1 text-lg rounded focus:outline-none"
         />
       </div>
@@ -51,7 +143,12 @@ const Form: FC = () => {
         <h3 className="text-lg text-gray-700 font-medium mb-2">Description</h3>
         <textarea
           name="description"
-          onChange={(e) => dispatchForm({[e.target.name]: e.target.value})}
+          onChange={(e) =>
+            dispatchForm({
+              type: PlaylistFormActionType.ModifyForm,
+              payload: {[e.target.name]: e.target.value},
+            })
+          }
           value={formState.description}
           rows={4}
           className="w-full border border-gray-300 pl-2 py-1 text-lg rounded resize-none focus:outline-none"
@@ -68,9 +165,13 @@ const Form: FC = () => {
 
         <OutlinedButton
           className="text-lg font-medium px-4 py-1 rounded focus:outline-none"
-          onClick={onPlaylistCreate}
+          onClick={
+            formState.type === PlaylistFormType.Create
+              ? onPlaylistCreate
+              : onPlaylistUpdate
+          }
         >
-          Create
+          {formState.type === PlaylistFormType.Create ? 'Create' : 'Update'}
         </OutlinedButton>
       </div>
     </div>
@@ -79,15 +180,13 @@ const Form: FC = () => {
 
 const PlaylistForm: FC = () => {
   return (
-    <PlaylistFormProvider>
-      <div className="flex flex-row p-6">
-        <div className="flex-1 m-auto">
-          <img src="/undraw_knowledge_g5gf.svg" />
-        </div>
-
-        <Form />
+    <div className="flex flex-row p-6">
+      <div className="flex-1 m-auto">
+        <img src="/undraw_knowledge_g5gf.svg" />
       </div>
-    </PlaylistFormProvider>
+
+      <Form />
+    </div>
   )
 }
 
