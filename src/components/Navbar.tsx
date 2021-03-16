@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faBell} from '@fortawesome/free-solid-svg-icons'
@@ -9,6 +10,12 @@ import usePlaylistForm, {
 } from '../lib/usePlaylistForm'
 import {PlaylistForm} from '../components/Playlist'
 import styled from 'styled-components'
+import {
+  User,
+  Query,
+  QueryUserArgs,
+} from '../types/generated/graphql'
+import {gql, useQuery} from '@apollo/client'
 
 const Container = styled.div`
   background: #ff8a83;
@@ -33,9 +40,33 @@ const Button = styled.button`
   }
 `
 
+const GET_USER = gql`
+  query GetUser {
+    user {
+      _id
+      firstName
+      lastName
+    }
+  }
+`
+
 const NavbarEnd: FC = () => {
+  const router = useRouter()
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
+
+  const {loading, data} = useQuery<Pick<Query, 'user'>>(
+    GET_USER,
+  )
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
+
+  const {user} = data
+  const onMyProfileClick = () => {
+    router.push(`/profile/${user[0]._id}`)
+  }
 
   const onPlaylistAddClick = () => {
     dispatchPlaylistForm({
@@ -69,7 +100,7 @@ const NavbarEnd: FC = () => {
 
   return (
     <div className="flex flex-row items-center">
-      <div className="flex flex-row items-center mx-4 cursor-pointer">
+      <div className="flex flex-row items-center mx-4 cursor-pointer" onClick={onMyProfileClick}>
         <div className="w-7 h-7 bg-white rounded-full mr-2" />
         <h1 className="text-md font-medium text-white">User</h1>
       </div>
