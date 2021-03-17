@@ -5,7 +5,6 @@ const Sidebar: FC = () => {
   const {state} = useSidebar()
   const {show, Content} = state
 
-  console.log(state)
   return show && (
     <div className="fixed w-72 h-screen bg-white shadow">
         <Content />

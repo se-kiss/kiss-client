@@ -1,7 +1,7 @@
 import {FC} from 'react'
 import ContentLoader from 'react-content-loader'
 
-const CommentSidebarLoading: FC = () => {
+const CommentListLoading: FC = () => {
   const attribute = {
     circle: {
       cx: 20,
@@ -31,4 +31,4 @@ const CommentSidebarLoading: FC = () => {
   )
 }
 
-export default CommentSidebarLoading
+export default CommentListLoading

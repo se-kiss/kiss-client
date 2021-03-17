@@ -6,7 +6,7 @@ import {PlaylistCard} from '../../components/Playlist'
 import {MediaType, Query} from '../../types/generated/graphql'
 import {gql, useQuery} from '@apollo/client'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
-import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 
 const GET_TAGS = gql`
@@ -55,6 +55,10 @@ const SideBox: FC = () => {
     {
       type: MediaType.Clip,
       icon: faVideo,
+    },
+    {
+      type: MediaType.Podcast,
+      icon: faMicrophoneAlt,
     },
   ]
 

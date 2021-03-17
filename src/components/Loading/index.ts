@@ -1,1 +1,1 @@
-export {default as SidebarListLoading} from './SidebarListLoading'
+export {default as CommentListLoading} from './CommentListLoading'

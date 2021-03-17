@@ -5,7 +5,7 @@ import {CommentBox, CommentCard} from './'
 import useSidebar, {SidebarActionTypes} from '../../lib/useSidebar'
 import {Media, Query, QueryCommentsArgs} from '../../types/generated/graphql'
 import {gql, useQuery} from '@apollo/client'
-import {SidebarListLoading} from '../Loading'
+import {CommentListLoading} from '../Loading'
 
 const GET_COMMENTS = gql`
   query GetComments($args: GetCommentsArgs) {
@@ -24,6 +24,7 @@ const GET_COMMENTS = gql`
 type CommentListProps = {
   media: Media
 }
+
 const CommentList: FC<CommentListProps> = ({media}) => {
   const {loading, data} = useQuery<Pick<Query, 'comments'>, QueryCommentsArgs>(
     GET_COMMENTS,
@@ -39,7 +40,7 @@ const CommentList: FC<CommentListProps> = ({media}) => {
   )
 
   if (loading) {
-    return <SidebarListLoading />
+    return <CommentListLoading />
   }
 
   const {comments} = data
