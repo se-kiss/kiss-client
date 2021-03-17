@@ -8,6 +8,7 @@ import {gql, useQuery} from '@apollo/client'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {PlaylistsSideLoading} from '../../components/Loading'
 
 const GET_TAGS = gql`
   query GetTags {
@@ -42,7 +43,7 @@ const SideBox: FC = () => {
   const {loading, data} = useQuery<Pick<Query, 'tag'>>(GET_TAGS)
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <PlaylistsSideLoading/>
   }
 
   const {tag: tags} = data
