@@ -20,7 +20,6 @@ const CREATE_PLAYLIST = gql`
       name
       ownerId
       description
-      tagIds
       _createdAt
       _updatedAt
     }
@@ -34,7 +33,6 @@ const UPDATE_PLAYLIST = gql`
       name
       ownerId
       description
-      tagIds
       _createdAt
       _updatedAt
     }
@@ -82,14 +80,13 @@ const Form: FC = () => {
 
   const onPlaylistCreate = () => {
     const {name, description} = formState
-    // TODO: Replace hardcode with userId and remove tagIds from playlist
+    // TODO: Replace hardcode with userId
     createPlaylist({
       variables: {
         args: {
           name,
           description,
-          ownerId: '604ef8ddb20501a019d40e23',
-          tagIds: ['604ef720854630484edc8c3e'],
+          ownerId: '605106b54d80c94de1f2d1d3',
         },
       },
       update: (cache, {data}) => {
