@@ -7,7 +7,7 @@ const Sidebar: FC = () => {
 
   console.log(state)
   return show && (
-    <div className="fixed w-full h-screen bg-white shadow">
+    <div className="fixed w-72 h-screen bg-white shadow">
         <Content />
     </div>
   )

@@ -135,6 +135,9 @@ const GET_PLAYLIST = gql`
             lastName
           }
         }
+        comments {
+          _id
+        }
         type
         paragraph
         _updatedAt
