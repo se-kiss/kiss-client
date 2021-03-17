@@ -25,6 +25,7 @@ import {
   MutationCreateReactionArgs,
   ReactionType,
 } from '../../../../types/generated/graphql'
+import { MainLoading } from '../../../../components/Loading'
 
 type MenuButtonProps = {
   active?: boolean
@@ -190,7 +191,7 @@ const MediaForm: NextPage = () => {
   const {id: playlistId} = router.query
 
   if (!playlistId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   return (

@@ -43,7 +43,6 @@ const App: FC<AppProps> = ({Component, pageProps}) => {
     <>
       <Head>
         <title>KiSS</title>
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       </Head>
       <GlobalStyle />
       <ApolloProvider client={client}>
