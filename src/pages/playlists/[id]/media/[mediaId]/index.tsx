@@ -192,7 +192,7 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
           <h4 className="text-lg text-gray-700 font-medium">
             {owner.firstName} {owner.lastName}
           </h4>
-          <Button className="px-4 rounded text-sm font-medium">Follow</Button>
+          <Button className="px-4 rounded text-sm font-medium hover:bg-red-400">Follow</Button>
         </div>
       </div>
 

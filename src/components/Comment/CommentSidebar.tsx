@@ -5,6 +5,7 @@ import {CommentBox, CommentCard} from './'
 import useSidebar, {SidebarActionTypes} from '../../lib/useSidebar'
 import {Media, Query, QueryCommentsArgs} from '../../types/generated/graphql'
 import {gql, useQuery} from '@apollo/client'
+import {SidebarListLoading} from '../Loading'
 
 const GET_COMMENTS = gql`
   query GetComments($args: GetCommentsArgs) {
@@ -20,11 +21,10 @@ const GET_COMMENTS = gql`
   }
 `
 
-type CommentSidebarProps = {
+type CommentListProps = {
   media: Media
 }
-
-const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
+const CommentList: FC<CommentListProps> = ({media}) => {
   const {loading, data} = useQuery<Pick<Query, 'comments'>, QueryCommentsArgs>(
     GET_COMMENTS,
     {
@@ -38,18 +38,32 @@ const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
     }
   )
 
+  if (loading) {
+    return <SidebarListLoading />
+  }
+
+  const {comments} = data
+
+  return (
+    <div className="overflow-y-auto h-4/5 mt-2">
+      {comments.map((comment) => (
+        <CommentCard key={comment._id} comment={comment} />
+      ))}
+    </div>
+  )
+}
+
+type CommentSidebarProps = {
+  media: Media
+}
+
+const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
   const {dispatch} = useSidebar()
   const onSidebarHide = () => {
     dispatch({
       type: SidebarActionTypes.HideSidebar,
     })
   }
-
-  if (loading) {
-    return <h1>Loading...</h1>
-  }
-
-  const {comments} = data
 
   return (
     <div className="p-4 w-full h-full">
@@ -63,11 +77,7 @@ const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
         />
       </div>
 
-      <div className="overflow-y-auto h-4/5 mt-2">
-        {comments.map((comment) => (
-          <CommentCard key={comment._id} comment={comment} />
-        ))}
-      </div>
+      <CommentList media={media} />
 
       <CommentBox media={media} />
     </div>
