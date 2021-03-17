@@ -37,11 +37,13 @@ export enum MediaFormActionTypes {
   EditMediaType = 'EDIT_MEDIA_TYPE',
   EditName = 'EDIT_NAME',
   EditTagIds = 'EDIT_TAG_IDS',
+  SetParagraph = 'SET_PARAGRAPH',
   AddParagraph = 'ADD_PARAGRAPH',
   EditParagraph = 'EDIT_PARAGRAPH',
   RemoveParagraph = 'REMOVE_PARAGRAPH',
   FocusParagraph = 'FOCUS_PARAGRAPH',
   EditDescription = 'EDIT_DESCRIPTION',
+  SetForm = 'SET_FORM',
   ResetForm = 'RESET_FORM',
 }
 
@@ -49,6 +51,7 @@ type MediaFormPayload = Partial<Omit<MediaFormState, 'paragraph'>> & {
   paragraph?: {
     index?: number
     text?: string
+    value?: string[]
   }
 }
 
@@ -109,6 +112,18 @@ const reducer: Reducer<MediaFormState, MediaFormAction> = (state, action) => {
         ...state,
         description: action.payload.description,
       }
+
+    case MediaFormActionTypes.SetForm: {
+      const {name, description, tagIds, mediaType, paragraph} = action.payload
+      return {
+        ...state,
+        name,
+        description,
+        tagIds,
+        mediaType,
+        paragraph: paragraph.value,
+      }
+    }
 
     case MediaFormActionTypes.ResetForm:
       return initialState

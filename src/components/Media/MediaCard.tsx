@@ -12,7 +12,7 @@ type MediaCardProps = {
 
 const MediaCard: FC<MediaCardProps> = ({media}) => {
   const router = useRouter()
-  const {_id, name, playlist, tags, type, _updatedAt} = media
+  const {_id, name, playlist, tags, type, comments, _updatedAt} = media
   const {user: owner} = playlist
 
   const onCardClick = () => {
@@ -78,7 +78,7 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
 
           <div className="flex flex-row items-center text-sm text-red-400 font-normal mr-8">
             <FontAwesomeIcon icon={faComment} className="mr-1" />
-            <h5>5,000</h5>
+            <h5>{comments.length}</h5>
           </div>
         </div>
       </div>

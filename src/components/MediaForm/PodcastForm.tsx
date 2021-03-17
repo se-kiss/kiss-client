@@ -1,16 +1,16 @@
 import {FC, createRef} from 'react'
+import styled from 'styled-components'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
 import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUpload} from '@fortawesome/free-solid-svg-icons'
-import styled from 'styled-components'
 
 const Button = styled.button`
   color: white;
   background: #ff8a83;
 `
 
-const VideoForm: FC = () => {
+const PodcastForm: FC = () => {
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {description} = formState
   const FileInputRef = createRef<HTMLInputElement>()
@@ -30,7 +30,7 @@ const VideoForm: FC = () => {
 
   return (
     <>
-      <div className="w-full h-80 bg-black rounded-t-xl flex justify-center items-center">
+      <div className="w-full h-36 bg-black rounded-t-xl flex justify-center items-center">
         <Button
           className="text-lg font-medium px-8 py-1 rounded focus:outline-none hover:bg-red-400"
           onClick={onUploadVideo}
@@ -66,4 +66,4 @@ const VideoForm: FC = () => {
   )
 }
 
-export default VideoForm
+export default PodcastForm
