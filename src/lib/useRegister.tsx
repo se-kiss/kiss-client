@@ -6,17 +6,17 @@ import {
 } from 'react'
 
 type RegisterState = {
+    email: string
     firstName: string
     lastName: string
-    userName: string
     password: string
     confirmPassword: string
 }
 
 const initialState: RegisterState = {
+    email: '',
     firstName: '',
     lastName: '',
-    userName: '',
     password: '',
     confirmPassword: ''
 }
