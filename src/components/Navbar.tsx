@@ -43,6 +43,10 @@ const GET_ME = gql`
     me {
       userId
       email
+      user {
+        firstName
+        lastName
+      }
     }
   }
 `
@@ -120,7 +124,7 @@ const NavbarEnd: FC = () => {
         onClick={onProfileClick}
       >
         <div className="w-7 h-7 bg-white rounded-full mr-2" />
-        <h1 className="text-md font-medium text-white">User</h1>
+        <h1 className="text-md font-medium text-white">{data?.me?.user?.firstName} {data?.me?.user?.lastName}</h1>
       </div>
 
       <IconButton

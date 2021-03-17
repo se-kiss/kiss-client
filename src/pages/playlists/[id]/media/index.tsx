@@ -118,6 +118,9 @@ const GET_PLAYLIST = gql`
         name
         color
       }
+      user {
+        _id
+      }
       media {
         _id
         name
@@ -146,6 +149,15 @@ const GET_PLAYLIST = gql`
   }
 `
 
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+      email
+    }
+  }
+`
+
 type SideBoxProps = {
   playlist: Playlist
 }
@@ -157,7 +169,13 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
 
-  const {name, description, tags} = playlist
+  const {name, description, tags, user: owner} = playlist
+
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
 
   const menuButtons = [
     {
@@ -221,20 +239,24 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
         <p className="text-sm text-gray-700 font-medium mt-2">{description}</p>
       </div>
 
-      <HorizontalLine className="my-4" />
+      {owner._id === data?.me.userId && (
+        <>
+          <HorizontalLine className="my-4" />
 
-      <div>
-        {menuButtons.map(({name, icon, onClick}) => (
-          <MenuButton
-            key={name}
-            className="rounded p-2 cursor-pointer flex flex-row items-center"
-            onClick={onClick}
-          >
-            <FontAwesomeIcon icon={icon} />
-            <span className="text-md font-medium ml-4">{name}</span>
-          </MenuButton>
-        ))}
-      </div>
+          <div>
+            {menuButtons.map(({name, icon, onClick}) => (
+              <MenuButton
+                key={name}
+                className="rounded p-2 cursor-pointer flex flex-row items-center"
+                onClick={onClick}
+              >
+                <FontAwesomeIcon icon={icon} />
+                <span className="text-md font-medium ml-4">{name}</span>
+              </MenuButton>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }

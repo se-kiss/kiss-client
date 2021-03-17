@@ -119,6 +119,15 @@ const ConfirmDeleteMedia: FC = () => {
   )
 }
 
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+      email
+    }
+  }
+`
+
 type SideBoxProps = {
   media: Media
 }
@@ -130,6 +139,12 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
   const {
     playlist: {user: owner},
   } = media
+
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
 
   const onAuthModalShow = () => {
     dispatchModal({
@@ -184,6 +199,9 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
     },
   ]
 
+  console.log(owner._id)
+  console.log(data.me.userId)
+
   return (
     <div className="px-4 py-6">
       <div className="flex flex-row items-start">
@@ -203,7 +221,7 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
           <MenuButton
             key={name}
             className="rounded p-2 cursor-pointer flex flex-row items-center"
-            onClick={true ? onClick : onAuthModalShow}
+            onClick={data?.me.userId ? onClick : onAuthModalShow}
           >
             <FontAwesomeIcon icon={icon} />
             <span className="text-md font-medium ml-4">{name}</span>
@@ -215,7 +233,7 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
 
       <div>
         {/* TODO: replace hardcord */}
-        {owner._id === '605106b54d80c94de1f2d1d3' &&
+        {owner._id === data?.me?.userId &&
           mediaMenus.map(({name, icon, onClick}) => (
             <MenuButton
               key={name}

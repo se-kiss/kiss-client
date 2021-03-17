@@ -6,6 +6,7 @@ import useRegister, {RegisterProvider} from '../lib/useRegister'
 import {gql, useMutation} from '@apollo/client'
 import {
   Mutation,
+  MutationCreateSubscriptionArgs,
   MutationCreateUserArgs,
   MutationLoginArgs,
   MutationRegisterArgs,
@@ -48,6 +49,14 @@ const LOGIN = gql`
   }
 `
 
+const CREATE_SUBSCRIPTION = gql`
+  mutation CreateSubscription($args: CreateSubscriptionArgs!) {
+    createSubscription(args: $args) {
+      _id
+    }
+  }
+`
+
 const Form = () => {
   const {state, dispatch} = useRegister()
   const router = useRouter()
@@ -63,6 +72,11 @@ const Form = () => {
 
   const [login] = useMutation<Pick<Mutation, 'login'>, MutationLoginArgs>(LOGIN)
 
+  const [createSubscription] = useMutation<
+    Pick<Mutation, 'createSubscription'>,
+    MutationCreateSubscriptionArgs
+  >(CREATE_SUBSCRIPTION)
+
   const onSubmit = () => {
     const {firstName, lastName, email, password} = state
     createUser({
@@ -76,19 +90,28 @@ const Form = () => {
               password,
             },
           },
-          update: () => {
-            login({
+          update: (cache, {data}) => {
+            createSubscription({
               variables: {
                 args: {
-                  email,
-                  password,
+                  userId: data.register.userId,
                 },
               },
-              update: (cache, {data}) => {
-                localStorage.setItem('AUTH_TOKEN', data.login.token)
-                cache.reset()
-                router.push('/')
-                
+              update: () => {
+                login({
+                  variables: {
+                    args: {
+                      email,
+                      password,
+                    },
+                  },
+                  update: (cache, {data}) => {
+
+                    localStorage.setItem('AUTH_TOKEN', data.login.token)
+                    cache.reset()
+                    router.push('/')
+                  },
+                })
               }
             })
           },

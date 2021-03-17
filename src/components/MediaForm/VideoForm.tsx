@@ -2,7 +2,7 @@ import {FC, createRef, useState, useEffect} from 'react'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
 import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUpload} from '@fortawesome/free-solid-svg-icons'
+import {faFileAlt, faUpload} from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 import axios from 'axios'
 
@@ -12,38 +12,34 @@ const Button = styled.button`
 `
 
 const VideoForm: FC = () => {
-  const [videoUri, setVideoUri] = useState(null)
   const [selectedFile, selectFile] = useState(null)
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {description} = formState
   const FileInputRef = createRef<HTMLInputElement>()
 
-  useEffect(() => {
-    if (selectedFile) {
-      const postVideo = async () => {
-        const data = new FormData()
-  
-        data.append('video', selectedFile)
-
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/video`,
-          data
-        )
-
-        // <iframe src="https://player.vimeo.com/${`video/524891127`}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1280" height="720" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Video"></iframe>
-        setVideoUri(`https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`)
-        // dispatchForm({payload: {videoId: `https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}})
-      }
-
-      postVideo()
-    }
-  }, [selectedFile])
-
-  const onUploadVideo = () => {
+  const onVideoSelect = () => {
     FileInputRef.current.click()
   }
 
-  console.log(videoUri)
+  const onVideoUpload = () => {
+    const postVideo = async () => {
+      const data = new FormData()
+
+      data.append('video', selectedFile)
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/video`,
+        data
+      )
+
+      // <iframe src="https://player.vimeo.com/${`video/524891127`}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1280" height="720" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Video"></iframe>
+      dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId: `https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}})
+    }
+
+    postVideo()
+  }
+
+  console.log(formState)
 
   const onEditDescription = (text: string) => {
     dispatchForm({
@@ -58,8 +54,16 @@ const VideoForm: FC = () => {
     <>
       <div className="w-full h-80 bg-black rounded-t-xl flex justify-center items-center">
         <Button
-          className="text-lg font-medium px-8 py-1 rounded focus:outline-none hover:bg-red-400"
-          onClick={onUploadVideo}
+          className="text-lg font-medium px-8 py-1 mx-4 rounded focus:outline-none hover:bg-red-400"
+          onClick={onVideoSelect}
+        >
+          <FontAwesomeIcon icon={faFileAlt} />
+          <span className="ml-2">Select File</span>
+        </Button>
+
+        <Button
+          className="text-lg font-medium px-8 py-1 mx-4 rounded focus:outline-none hover:bg-red-400"
+          onClick={onVideoUpload}
         >
           <FontAwesomeIcon icon={faUpload} />
           <span className="ml-2">Upload</span>

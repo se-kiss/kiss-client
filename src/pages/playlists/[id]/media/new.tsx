@@ -4,7 +4,12 @@ import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
-import {ArticleForm, VideoForm, MediaFormButtons, PodcastForm} from '../../../../components/MediaForm'
+import {
+  ArticleForm,
+  VideoForm,
+  MediaFormButtons,
+  PodcastForm,
+} from '../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
   MediaFormProvider,
@@ -17,6 +22,8 @@ import {
   Mutation,
   MutationCreateMediaArgs,
   MediaType,
+  MutationCreateReactionArgs,
+  ReactionType,
 } from '../../../../types/generated/graphql'
 
 type MenuButtonProps = {
@@ -92,6 +99,14 @@ const CREATE_MEDIA = gql`
   }
 `
 
+const CREATE_REACTION = gql`
+  mutation CreateReaction($args: CreateReactionArgs!) {
+    createReaction(args: $args) {
+      _id
+    }
+  }
+`
+
 type FormProps = {
   playlistId: string
 }
@@ -104,28 +119,46 @@ const Form: FC<FormProps> = ({playlistId}) => {
     MutationCreateMediaArgs
   >(CREATE_MEDIA)
 
+  const [createReaction] = useMutation<
+    Pick<Mutation, 'createReaction'>,
+    MutationCreateReactionArgs
+  >(CREATE_REACTION)
+
   const closeForm = () => {
     dispatchForm({type: MediaFormActionTypes.ResetForm})
     router.push(`/playlists/${playlistId}/media`)
   }
 
   const onCreateClick = () => {
-    const {name, tagIds, mediaType, paragraph} = formState
+    const {name, tagIds, mediaType, paragraph, videoId, description} = formState
 
     createMedia({
       variables: {
         args: {
           playlistId,
-          name,
-          tagIds,
           type: mediaType,
+          tagIds,
+          name,
           paragraph,
         },
       },
-      update: (cache) => {
-        cache.reset()
-        closeForm()
-      }
+      update: (cache, {data}) => {
+        createReaction({
+          variables: {
+            args: {
+              sourceId: data.createMedia._id,
+              reactionType: ReactionType.Post,
+              upVote: [],
+              downVote: [],
+            },
+          },
+          update: (cache) => {
+            console.log('ok')
+            cache.reset()
+            closeForm()
+          },
+        })
+      },
     })
   }
 
@@ -144,7 +177,7 @@ const Form: FC<FormProps> = ({playlistId}) => {
     <div>
       <FormComponent />
       <div className="py-4">
-        <MediaFormButtons  onSubmit={onCreateClick} onCancel={closeForm} />
+        <MediaFormButtons onSubmit={onCreateClick} onCancel={closeForm} />
       </div>
     </div>
   )
