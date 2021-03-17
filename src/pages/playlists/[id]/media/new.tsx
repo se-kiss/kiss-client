@@ -1,10 +1,10 @@
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
-import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC} from 'react'
 import {Layout} from '../../../../components'
-import {ArticleForm, VideoForm, MediaFormButtons} from '../../../../components/MediaForm'
+import {ArticleForm, VideoForm, MediaFormButtons, PodcastForm} from '../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
   MediaFormProvider,
@@ -35,7 +35,6 @@ const MenuButton = styled.div<MenuButtonProps>`
 
 const SideBox: FC = () => {
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
-  const formTitle = 'Create Media'
 
   const mediaTypes = [
     {
@@ -48,11 +47,16 @@ const SideBox: FC = () => {
       name: 'Video',
       icon: faVideo,
     },
+    {
+      type: MediaType.Podcast,
+      name: 'Podcast',
+      icon: faMicrophoneAlt,
+    },
   ]
 
   return (
     <div className="px-4 py-6">
-      <h1 className="text-xl text-gray-700 font-semibold">{formTitle}</h1>
+      <h1 className="text-xl text-gray-700 font-semibold">Create Media</h1>
 
       <HorizontalLine className="my-4" />
 
@@ -94,11 +98,16 @@ type FormProps = {
 
 const Form: FC<FormProps> = ({playlistId}) => {
   const router = useRouter()
-  const {state: formState} = useMediaForm()
+  const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const [createMedia] = useMutation<
     Pick<Mutation, 'createMedia'>,
     MutationCreateMediaArgs
   >(CREATE_MEDIA)
+
+  const closeForm = () => {
+    dispatchForm({type: MediaFormActionTypes.ResetForm})
+    router.push(`/playlists/${playlistId}/media`)
+  }
 
   const onCreateClick = () => {
     const {name, tagIds, mediaType, paragraph} = formState
@@ -115,7 +124,7 @@ const Form: FC<FormProps> = ({playlistId}) => {
       },
       update: (cache) => {
         cache.reset()
-        router.push(`/playlists/${playlistId}/media`)
+        closeForm()
       }
     })
   }
@@ -126,6 +135,8 @@ const Form: FC<FormProps> = ({playlistId}) => {
         return ArticleForm
       case MediaType.Clip:
         return VideoForm
+      case MediaType.Podcast:
+        return PodcastForm
     }
   })(formState.mediaType)
 
@@ -133,7 +144,7 @@ const Form: FC<FormProps> = ({playlistId}) => {
     <div>
       <FormComponent />
       <div className="py-4">
-        <MediaFormButtons onSubmit={onCreateClick} />
+        <MediaFormButtons  onSubmit={onCreateClick} onCancel={closeForm} />
       </div>
     </div>
   )

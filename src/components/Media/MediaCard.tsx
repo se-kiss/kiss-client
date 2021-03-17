@@ -12,7 +12,7 @@ type MediaCardProps = {
 
 const MediaCard: FC<MediaCardProps> = ({media}) => {
   const router = useRouter()
-  const {_id, name, playlist, tags, type, _updatedAt} = media
+  const {_id, name, playlist, tags, type, comments, _updatedAt} = media
   const {user: owner} = playlist
 
   const onCardClick = () => {
@@ -37,9 +37,9 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
   return (
     <div
       className="relative bg-white w-3/4 rounded-lg shadow-xl p-4 my-8 mx-auto cursor-pointer"
-      onClick={onCardClick}
+      
     >
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" onClick={() => router.push(`/profile/${owner._id}`)}>
         <div className="w-8 h-8 rounded-full bg-red-400 mr-4" />
 
         <div>
@@ -48,7 +48,7 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
         </div>
       </div>
 
-      <div className="px-4 mt-2 mx-8">
+      <div className="px-4 mt-2 mx-8" onClick={onCardClick}>
         <h1 className="text-xl text-gray-700 font-medium">{name}</h1>
 
         <div className="flex flex-row flex-wrap items-center">
@@ -78,7 +78,7 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
 
           <div className="flex flex-row items-center text-sm text-red-400 font-normal mr-8">
             <FontAwesomeIcon icon={faComment} className="mr-1" />
-            <h5>5,000</h5>
+            <h5>{comments.length}</h5>
           </div>
         </div>
       </div>

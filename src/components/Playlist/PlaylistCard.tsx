@@ -19,9 +19,8 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
   return (
     <div
       className="bg-white w-3/4 rounded-lg shadow-xl p-4 my-8 mx-auto cursor-pointer"
-      onClick={() => router.push(`/playlists/${_id}/media`)}
     >
-      <div className="flex flex-row items-center">
+      <div className="flex flex-row items-center" onClick={() => router.push(`/profile/${owner._id}`)}>
         <div className="w-8 h-8 rounded-full bg-red-400 mr-4" />
 
         <div>
@@ -30,7 +29,9 @@ const PlaylistCard: FC<PlaylistCardProps> = ({playlist}) => {
         </div>
       </div>
 
-      <div className="px-4 mt-2 mx-8">
+      <div 
+        className="px-4 mt-2 mx-8"
+        onClick={() => router.push(`/playlists/${_id}/media`)}>
         <h1 className="text-xl text-gray-700 font-medium">{name}</h1>
 
         <div className="flex flex-row flex-wrap items-center">
