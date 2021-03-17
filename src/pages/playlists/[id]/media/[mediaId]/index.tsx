@@ -67,7 +67,7 @@ const ConfirmDeleteMedia: FC = () => {
     MutationDeleteMediaArgs
   >(DELETE_MEDIA)
 
-  if (!playlistId || !mediaId) {
+  if (!playlistId || !mediaId ) {
     return <h1>Loading...</h1>
   }
 
