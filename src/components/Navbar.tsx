@@ -38,12 +38,15 @@ const Button = styled.button`
   }
 `
 
-const GET_USER = gql`
-  query GetUser {
-    user {
-      _id
-      firstName
-      lastName
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+      email
+      user {
+        firstName
+        lastName
+      }
     }
   }
 `
@@ -54,15 +57,19 @@ const NavbarEnd: FC = () => {
   const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
   const {dispatch} = useSidebar()
 
-  const {loading, data} = useQuery<Pick<Query, 'user'>>(GET_USER)
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
 
   if (loading) {
     return <h1>Loading...</h1>
   }
 
-  const {user} = data
-  const onMyProfileClick = () => {
-    router.push(`/profile/${user[0]._id}`)
+  const onProfileClick = () => {
+    router.push(`/profile/${data?.me?.userId}`)
+  }
+
+  const onLogout = () => {
+    localStorage.removeItem('AUTH_TOKEN')
+    router.reload()
   }
 
   const onPlaylistAddClick = () => {
@@ -90,14 +97,20 @@ const NavbarEnd: FC = () => {
     })
   }
 
-  if (!true) {
+  if (!data?.me?.userId) {
     return (
       <div className="flex flex-row items-center">
-        <h1 className="text-md text-white font-medium mx-4 cursor-pointer">
+        <h1
+          className="text-md text-white font-medium mx-4 cursor-pointer"
+          onClick={() => router.push('/login')}
+        >
           Login
         </h1>
 
-        <Button className="bg-white px-3 py-1 text-md font-semibold shadow-md rounded mx-4">
+        <Button
+          className="bg-white px-3 py-1 text-md font-semibold shadow-md rounded mx-4"
+          onClick={() => router.push('/register')}
+        >
           Register
         </Button>
       </div>
@@ -108,10 +121,10 @@ const NavbarEnd: FC = () => {
     <div className="flex flex-row items-center">
       <div
         className="flex flex-row items-center mx-4 cursor-pointer"
-        onClick={onMyProfileClick}
+        onClick={onProfileClick}
       >
         <div className="w-7 h-7 bg-white rounded-full mr-2" />
-        <h1 className="text-md font-medium text-white">User</h1>
+        <h1 className="text-md font-medium text-white">{data?.me?.user?.firstName} {data?.me?.user?.lastName}</h1>
       </div>
 
       <IconButton
@@ -127,6 +140,13 @@ const NavbarEnd: FC = () => {
       >
         <FontAwesomeIcon icon={faBell} className="text-md font-medium" />
       </IconButton>
+
+      <h1
+        className="text-sm text-white font-medium mx-4 cursor-pointer"
+        onClick={onLogout}
+      >
+        Logout
+      </h1>
     </div>
   )
 }

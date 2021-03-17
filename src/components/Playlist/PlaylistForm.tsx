@@ -6,11 +6,12 @@ import usePlaylistForm, {
   PlaylistFormType,
 } from '../../lib/usePlaylistForm'
 import {OutlinedButton} from '../common'
-import {gql, useMutation} from '@apollo/client'
+import {gql, useMutation, useQuery} from '@apollo/client'
 import {
   Mutation,
   MutationCreatePlaylistArgs,
   MutationUpdatePlaylistArgs,
+  Query,
 } from '../../types/generated/graphql'
 
 const CREATE_PLAYLIST = gql`
@@ -39,10 +40,22 @@ const UPDATE_PLAYLIST = gql`
   }
 `
 
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+      email
+    }
+  }
+`
+
 const Form: FC = () => {
   const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = usePlaylistForm()
   const {dispatch: dispatchModal} = useModal()
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
+
+  
 
   const [createPlaylist] = useMutation<
     Pick<Mutation, 'createPlaylist'>,
@@ -53,6 +66,10 @@ const Form: FC = () => {
     Pick<Mutation, 'updatePlaylist'>,
     MutationUpdatePlaylistArgs
   >(UPDATE_PLAYLIST)
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
 
   const formTitle = ((type) => {
     switch (type) {
@@ -80,13 +97,12 @@ const Form: FC = () => {
 
   const onPlaylistCreate = () => {
     const {name, description} = formState
-    // TODO: Replace hardcode with userId
     createPlaylist({
       variables: {
         args: {
           name,
           description,
-          ownerId: '605106b54d80c94de1f2d1d3',
+          ownerId: data?.me?.userId,
         },
       },
       update: (cache, {data}) => {

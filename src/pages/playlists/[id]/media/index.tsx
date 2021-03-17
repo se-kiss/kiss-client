@@ -1,12 +1,13 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
-import {FC} from 'react'
+import React, {FC} from 'react'
 import {Layout} from '../../../../components'
 import {
   HorizontalLine,
   Tag,
   OutlinedButton,
 } from '../../../../components/common'
+import {MainLoading, SideBoxLoading} from '../../../../components/Loading'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 import usePlaylistForm, {
@@ -56,7 +57,7 @@ const ConfirmDeletePlaylist: FC = () => {
   >(DELETE_PLAYLIST)
 
   if (!playlistId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const closeModal = () =>
@@ -118,6 +119,9 @@ const GET_PLAYLIST = gql`
         name
         color
       }
+      user {
+        _id
+      }
       media {
         _id
         name
@@ -133,6 +137,7 @@ const GET_PLAYLIST = gql`
             _id
             firstName
             lastName
+            profileImageId
           }
         }
         comments {
@@ -142,6 +147,15 @@ const GET_PLAYLIST = gql`
         paragraph
         _updatedAt
       }
+    }
+  }
+`
+
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+      email
     }
   }
 `
@@ -157,7 +171,13 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
   const {dispatch: dispatchModal} = useModal()
   const {dispatch: dispatchPlaylistForm} = usePlaylistForm()
 
-  const {name, description, tags} = playlist
+  const {name, description, tags, user: owner} = playlist
+
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
+
+  if (loading) {
+    return <SideBoxLoading />
+  }
 
   const menuButtons = [
     {
@@ -221,20 +241,24 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
         <p className="text-sm text-gray-700 font-medium mt-2">{description}</p>
       </div>
 
-      <HorizontalLine className="my-4" />
+      {owner._id === data?.me.userId && (
+        <>
+          <HorizontalLine className="my-4" />
 
-      <div>
-        {menuButtons.map(({name, icon, onClick}) => (
-          <MenuButton
-            key={name}
-            className="rounded p-2 cursor-pointer flex flex-row items-center"
-            onClick={onClick}
-          >
-            <FontAwesomeIcon icon={icon} />
-            <span className="text-md font-medium ml-4">{name}</span>
-          </MenuButton>
-        ))}
-      </div>
+          <div>
+            {menuButtons.map(({name, icon, onClick}) => (
+              <MenuButton
+                key={name}
+                className="rounded p-2 cursor-pointer flex flex-row items-center"
+                onClick={onClick}
+              >
+                <FontAwesomeIcon icon={icon} />
+                <span className="text-md font-medium ml-4">{name}</span>
+              </MenuButton>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -244,7 +268,7 @@ const PlaylistPage: NextPage = () => {
   const {id: playlistId} = router.query
 
   if (!playlistId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {loading, data} = useQuery<
@@ -259,7 +283,7 @@ const PlaylistPage: NextPage = () => {
   })
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {playlists} = data

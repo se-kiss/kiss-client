@@ -2,22 +2,23 @@ import {
     createContext,
     FC,
     useReducer,
-    useContext
+    useContext,
+    Dispatch
 } from 'react'
 
 type LoginState = {
-    userName: string
+    email: string
     password: string
 }
 
 const initialState: LoginState = {
-    userName: '',
+    email: '',
     password: ''
 }
 
 interface ILoginContext {
     state: LoginState
-    dispatch: any
+    dispatch: Dispatch<Partial<LoginState>>
 }
 
 const LoginContext = createContext<ILoginContext>({
