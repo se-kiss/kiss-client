@@ -33,17 +33,12 @@ const VideoForm: FC = () => {
         data
       )
 
-      const videoId = res.uri ? `https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479` : null
+      const videoId = res.data.uri
+        ? `https://player.vimeo.com/${res.data.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
+        : null
 
-      console.log(videoId)
-      if (videoId) {
-        dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId}})
-        setLoading(false)
-      } else {
-        selectFile(null)
-        setLoading(null)
-      }
-      
+      dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId}})
+      setLoading(false)
     }
 
     setLoading(true)
@@ -63,7 +58,9 @@ const VideoForm: FC = () => {
     <>
       <div className="w-full h-80 bg-black rounded-t-xl flex flex-col justify-center items-center">
         <Button
-          className={`text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none ${selectedFile && 'bg-red-400'} hover:bg-red-400`}
+          className={`text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none ${
+            selectedFile && 'bg-red-400'
+          } hover:bg-red-400`}
           onClick={onVideoSelect}
         >
           <FontAwesomeIcon icon={faFileAlt} />
@@ -75,7 +72,13 @@ const VideoForm: FC = () => {
           onClick={onVideoUpload}
         >
           <FontAwesomeIcon icon={faUpload} />
-          <span className="ml-2">{loading === null ? 'Upload' : loading ? 'Uploading...' : 'Complete'}</span>
+          <span className="ml-2">
+            {loading === null
+              ? 'Upload'
+              : loading
+              ? 'Uploading...'
+              : 'Complete'}
+          </span>
         </Button>
 
         <input
