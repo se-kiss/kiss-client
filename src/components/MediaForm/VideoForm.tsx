@@ -12,6 +12,7 @@ const Button = styled.button`
 `
 
 const VideoForm: FC = () => {
+  const [loading, setLoading] = useState(null)
   const [selectedFile, selectFile] = useState(null)
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {description} = formState
@@ -32,14 +33,22 @@ const VideoForm: FC = () => {
         data
       )
 
-      // <iframe src="https://player.vimeo.com/${`video/524891127`}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1280" height="720" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Video"></iframe>
-      dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId: `https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`}})
+      const videoId = res.uri ? `https://player.vimeo.com/${res.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479` : null
+
+      console.log(videoId)
+      if (videoId) {
+        dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId}})
+        setLoading(false)
+      } else {
+        selectFile(null)
+        setLoading(null)
+      }
+      
     }
 
+    setLoading(true)
     postVideo()
   }
-
-  console.log(formState)
 
   const onEditDescription = (text: string) => {
     dispatchForm({
@@ -52,21 +61,21 @@ const VideoForm: FC = () => {
 
   return (
     <>
-      <div className="w-full h-80 bg-black rounded-t-xl flex justify-center items-center">
+      <div className="w-full h-80 bg-black rounded-t-xl flex flex-col justify-center items-center">
         <Button
-          className="text-lg font-medium px-8 py-1 mx-4 rounded focus:outline-none hover:bg-red-400"
+          className={`text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none ${selectedFile && 'bg-red-400'} hover:bg-red-400`}
           onClick={onVideoSelect}
         >
           <FontAwesomeIcon icon={faFileAlt} />
-          <span className="ml-2">Select File</span>
+          <span className="ml-2">{!selectedFile ? 'Select File' : 'File'}</span>
         </Button>
 
         <Button
-          className="text-lg font-medium px-8 py-1 mx-4 rounded focus:outline-none hover:bg-red-400"
+          className="text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none hover:bg-red-400"
           onClick={onVideoUpload}
         >
           <FontAwesomeIcon icon={faUpload} />
-          <span className="ml-2">Upload</span>
+          <span className="ml-2">{loading === null ? 'Upload' : loading ? 'Uploading...' : 'Complete'}</span>
         </Button>
 
         <input

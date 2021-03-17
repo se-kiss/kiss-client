@@ -8,6 +8,7 @@ import {
   Tag,
 } from '../../../../../components/common'
 import {CommentSidebar} from '../../../../../components/Comment'
+import {MainLoading} from '../../../../../components/Loading'
 import useModal, {ModalActionTypes} from '../../../../../lib/useModal'
 import useSidebar, {SidebarActionTypes} from '../../../../../lib/useSidebar'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -67,7 +68,7 @@ const ConfirmDeleteMedia: FC = () => {
     MutationDeleteMediaArgs
   >(DELETE_MEDIA)
 
-  if (!playlistId || !mediaId ) {
+  if (!playlistId || !mediaId) {
     return <h1>Loading...</h1>
   }
 
@@ -199,18 +200,25 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
     },
   ]
 
-  console.log(owner._id)
-  console.log(data.me.userId)
-
   return (
     <div className="px-4 py-6">
       <div className="flex flex-row items-start">
-        <div className="w-7 h-7 rounded-full bg-red-400 mr-4" />
+        <div className="w-7 h-7 rounded-full bg-red-400 mr-4">
+          {owner.profileImageId && (
+            <img
+              className="w-full h-8 rounded-full"
+              src={owner.profileImageId}
+            />
+          )}
+        </div>
+
         <div>
           <h4 className="text-lg text-gray-700 font-medium">
             {owner.firstName} {owner.lastName}
           </h4>
-          <Button className="px-4 rounded text-sm font-medium hover:bg-red-400">Follow</Button>
+          <Button className="px-4 rounded text-sm font-medium hover:bg-red-400">
+            Follow
+          </Button>
         </div>
       </div>
 
@@ -295,10 +303,11 @@ const Article: FC<MediaComponentProps> = ({media}) => {
 }
 
 const Video: FC<MediaComponentProps> = ({media}) => {
-  const {name, description, tags} = media
+  const {name, description, tags, videoId} = media
+  console.log(videoId)
   return (
     <div className="bg-white w-10/12 h-auto rounded-xl shadow-xl">
-      <iframe className="w-full h-80 rounded-t-xl" />
+      <iframe src={videoId} className="w-full h-80 rounded-t-xl" />
       <div className="px-10 pt-4 pb-8">
         <h1 className="text-2xl text-gray-700 font-semibold">{name}</h1>
 
@@ -381,6 +390,7 @@ const GET_MEDIA = gql`
       description
       paragraph
       type
+      videoId
       tags {
         _id
         name
@@ -392,6 +402,7 @@ const GET_MEDIA = gql`
           _id
           firstName
           lastName
+          profileImageId
         }
       }
     }
@@ -403,7 +414,7 @@ const MediaPage: NextPage = () => {
   const {mediaId} = router.query
 
   if (!mediaId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(
@@ -418,7 +429,7 @@ const MediaPage: NextPage = () => {
   )
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {media} = data

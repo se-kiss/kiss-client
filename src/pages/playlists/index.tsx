@@ -8,8 +8,8 @@ import {gql, useQuery} from '@apollo/client'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {PlaylistsSideLoading} from '../../components/Loading'
-import {PlaylistsPageLoading} from '../../components/Loading'
+import {SideBoxLoading} from '../../components/Loading'
+import {MainLoading} from '../../components/Loading'
 
 const GET_TAGS = gql`
   query GetTags {
@@ -44,7 +44,7 @@ const SideBox: FC = () => {
   const {loading, data} = useQuery<Pick<Query, 'tag'>>(GET_TAGS)
 
   if (loading) {
-    return <PlaylistsSideLoading/>
+    return <SideBoxLoading/>
   }
 
   const {tag: tags} = data
@@ -124,6 +124,7 @@ const GET_PLAYLISTS = gql`
         _id
         firstName
         lastName
+        profileImageId
       }
       _updatedAt
     }
@@ -134,7 +135,7 @@ const Playlists: NextPage = () => {
   const {loading, data} = useQuery<Pick<Query, 'playlists'>>(GET_PLAYLISTS)
 
   if (loading) {
-    return <PlaylistsPageLoading/>
+    return <MainLoading/>
   }
 
   console.log(data)

@@ -1,12 +1,13 @@
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
-import {FC} from 'react'
+import React, {FC} from 'react'
 import {Layout} from '../../../../components'
 import {
   HorizontalLine,
   Tag,
   OutlinedButton,
 } from '../../../../components/common'
+import {MainLoading, SideBoxLoading} from '../../../../components/Loading'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPlus, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 import usePlaylistForm, {
@@ -56,7 +57,7 @@ const ConfirmDeletePlaylist: FC = () => {
   >(DELETE_PLAYLIST)
 
   if (!playlistId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const closeModal = () =>
@@ -136,6 +137,7 @@ const GET_PLAYLIST = gql`
             _id
             firstName
             lastName
+            profileImageId
           }
         }
         comments {
@@ -174,7 +176,7 @@ const SideBox: FC<SideBoxProps> = ({playlist}) => {
   const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <SideBoxLoading />
   }
 
   const menuButtons = [
@@ -266,7 +268,7 @@ const PlaylistPage: NextPage = () => {
   const {id: playlistId} = router.query
 
   if (!playlistId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {loading, data} = useQuery<
@@ -281,7 +283,7 @@ const PlaylistPage: NextPage = () => {
   })
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {playlists} = data

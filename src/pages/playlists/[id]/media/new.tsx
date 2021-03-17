@@ -140,6 +140,8 @@ const Form: FC<FormProps> = ({playlistId}) => {
           tagIds,
           name,
           paragraph,
+          videoId,
+          description,
         },
       },
       update: (cache, {data}) => {

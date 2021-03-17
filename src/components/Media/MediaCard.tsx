@@ -40,7 +40,9 @@ const MediaCard: FC<MediaCardProps> = ({media}) => {
       
     >
       <div className="flex flex-row items-center" onClick={() => router.push(`/profile/${owner._id}`)}>
-        <div className="w-8 h-8 rounded-full bg-red-400 mr-4" />
+        <div className="w-8 h-8 rounded-full bg-red-400 mr-4">
+          {owner.profileImageId && <img className="w-full h-8 rounded-full" src={owner.profileImageId} />}
+        </div>
 
         <div>
           <h2 className="text-sm text-gray-700 font-medium">{`${owner.firstName} ${owner.lastName}`}</h2>

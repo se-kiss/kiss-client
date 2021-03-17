@@ -4,6 +4,7 @@ import {useRouter} from 'next/router'
 import styled from 'styled-components'
 import useRegister, {RegisterProvider} from '../lib/useRegister'
 import {gql, useMutation} from '@apollo/client'
+import axios from 'axios'
 import {
   Mutation,
   MutationCreateSubscriptionArgs,
@@ -11,12 +12,12 @@ import {
   MutationLoginArgs,
   MutationRegisterArgs,
 } from '../types/generated/graphql'
+import {createRef, useState} from 'react'
 
 const Button = styled.button`
   border: 1px solid #ff8a83;
   color: white;
   background: #ff8a83;
-  width: 100%;
   padding: 0.4rem 0rem;
 
   &:hover {
@@ -58,6 +59,8 @@ const CREATE_SUBSCRIPTION = gql`
 `
 
 const Form = () => {
+  const [selectedFile, selectFile] = useState(null)
+  const [loading, setLoading] = useState(null)
   const {state, dispatch} = useRegister()
   const router = useRouter()
   const [createUser] = useMutation<
@@ -76,6 +79,33 @@ const Form = () => {
     Pick<Mutation, 'createSubscription'>,
     MutationCreateSubscriptionArgs
   >(CREATE_SUBSCRIPTION)
+
+  const FileInputRef = createRef<HTMLInputElement>()
+
+  const onImageSelect = () => {
+    FileInputRef.current.click()
+  }
+
+  const onImageUpload = () => {
+    const postImage = async () => {
+      const data = new FormData()
+
+      data.append('img', selectedFile)
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/img`,
+        data
+      )
+
+      setLoading(false)
+      console.log(res._id)
+    }
+
+    if (selectedFile) {
+      setLoading(true)
+      postImage()
+    }
+  }
 
   const onSubmit = () => {
     const {firstName, lastName, email, password} = state
@@ -106,13 +136,12 @@ const Form = () => {
                     },
                   },
                   update: (cache, {data}) => {
-
                     localStorage.setItem('AUTH_TOKEN', data.login.token)
                     cache.reset()
                     router.push('/')
                   },
                 })
-              }
+              },
             })
           },
         })
@@ -126,6 +155,38 @@ const Form = () => {
         <h4 className="text-2xl text-gray-700 font-semibold text-center my-7">
           Register
         </h4>
+
+        <div className="flex flex-col justify-center items-center">
+          <div
+            className={`rounded-full w-36 h-36 ${
+              !selectedFile
+                ? 'bg-red-300 cursor-pointer hover:bg-red-400'
+                : 'bg-red-400'
+            } flex justify-center items-center`}
+            onClick={!selectedFile ? onImageSelect : undefined}
+          >
+            <h2 className="text-center text-white text-lg font-medium">
+              {!selectedFile ? 'Select Profile' : 'Profile'}
+            </h2>
+            <input
+              type="file"
+              className="hidden"
+              ref={FileInputRef}
+              onChange={(e) => selectFile(e.target.files[0])}
+            />
+          </div>
+
+          <Button
+            className="mt-3 text-sm rounded focus:outline-none"
+            onClick={onImageUpload}
+          >
+            {loading === null
+              ? 'Upload'
+              : loading
+              ? 'Uploading...'
+              : 'Complete'}
+          </Button>
+        </div>
 
         <div className="mt-3">
           <h3 className="text-lg text-gray-700 font-medium mb-2">Email</h3>
@@ -195,7 +256,10 @@ const Form = () => {
         </div>
 
         <div className="mt-10">
-          <Button className="focus:outline-none" onClick={onSubmit}>
+          <Button
+            className="w-full rounded focus:outline-none"
+            onClick={onSubmit}
+          >
             Submit
           </Button>
         </div>

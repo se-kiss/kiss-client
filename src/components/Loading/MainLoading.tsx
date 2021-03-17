@@ -1,6 +1,6 @@
 import {NextPage} from 'next'
-import {Layout} from '../../components'
-import {PlaylistsSideLoading} from './' 
+import {Layout} from '..'
+import {SideBoxLoading} from '.' 
 import {FC} from 'react'
 import ContentLoader from 'react-content-loader'
 
@@ -14,7 +14,7 @@ const PlaylistCardLoading: FC = () => {
 }
 const PlaylistsPageLoading: NextPage = () => {
   return (
-    <Layout SideComponent={PlaylistsSideLoading}>
+    <Layout SideComponent={SideBoxLoading}>
         <PlaylistCardLoading/>
     </Layout>
   )
