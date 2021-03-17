@@ -1,6 +1,4 @@
-import {useRouter} from 'next/router'
 import {FC} from 'react'
-import {Tag} from '../common'
 import {User, Subscription} from '../../types/generated/graphql'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faUserFriends} from '@fortawesome/free-solid-svg-icons'

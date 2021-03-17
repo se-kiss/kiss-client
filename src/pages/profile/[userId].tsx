@@ -73,6 +73,7 @@ const GET_USER = gql`
   }
 
   const {user} = data
+  //todo: connect users with api
 
     return (
       <Layout>
