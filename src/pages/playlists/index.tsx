@@ -9,6 +9,7 @@ import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {PlaylistsSideLoading} from '../../components/Loading'
+import {PlaylistsPageLoading} from '../../components/Loading'
 
 const GET_TAGS = gql`
   query GetTags {
@@ -133,7 +134,7 @@ const Playlists: NextPage = () => {
   const {loading, data} = useQuery<Pick<Query, 'playlists'>>(GET_PLAYLISTS)
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <PlaylistsPageLoading/>
   }
 
   console.log(data)
