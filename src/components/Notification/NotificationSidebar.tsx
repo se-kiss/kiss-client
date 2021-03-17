@@ -36,10 +36,10 @@ const NotificationItem: FC<NotificationItemProps> = ({notification}) => {
 
   return (
     <div>
-      <h2 className="text-gray-700 text-md font-medium">
+      <h2 className="text-gray-500 text-md font-medium">
         {owner.firstName} {owner.lastName} just posts
       </h2>
-      <h4 className="text-gray-700 text-sm">{formatedDate}</h4>
+      <h4 className="text-gray-500 text-sm">{formatedDate}</h4>
     </div>
   )
 }
@@ -79,7 +79,7 @@ const NotificationSidebar: FC = () => {
   return (
     <div className="p-4 w-full h-full">
       <div className="flex flex-row justify-between items-center">
-        <h1 className="text-xl font-semibold text-gray-500">Notifications</h1>
+        <h1 className="text-xl font-semibold text-gray-700">Notifications</h1>
 
         <FontAwesomeIcon
           icon={faTimes}

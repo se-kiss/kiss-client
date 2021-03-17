@@ -69,7 +69,7 @@ const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
   return (
     <div className="p-4 w-full h-full">
       <div className="flex flex-row justify-between items-center">
-        <h1 className="text-xl font-semibold text-gray-500">Comments</h1>
+        <h1 className="text-xl font-semibold text-gray-700">Comments</h1>
 
         <FontAwesomeIcon
           icon={faTimes}
