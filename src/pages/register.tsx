@@ -98,7 +98,7 @@ const Form = () => {
       )
 
       setLoading(false)
-      console.log(res._id)
+      console.log(res.data._id)
     }
 
     if (selectedFile) {
