@@ -1,4 +1,4 @@
-import {FC, createRef, useState, useEffect} from 'react'
+import {FC, createRef, useState} from 'react'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
 import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
