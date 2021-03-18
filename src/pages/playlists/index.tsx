@@ -1,15 +1,16 @@
 import {NextPage} from 'next'
-import {FC, useState} from 'react'
+import {FC} from 'react'
 import {Layout} from '../../components'
 import {Tag} from '../../components/common'
 import {PlaylistCard} from '../../components/Playlist'
-import {MediaType, Query} from '../../types/generated/graphql'
+import {MediaType, Playlist, Query} from '../../types/generated/graphql'
 import {gql, useQuery} from '@apollo/client'
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
 import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {SideBoxLoading} from '../../components/Loading'
 import {MainLoading} from '../../components/Loading'
+import useSearch, {SearchProvider} from '../../lib/useSearch'
 
 const GET_TAGS = gql`
   query GetTags {
@@ -22,15 +23,15 @@ const GET_TAGS = gql`
 `
 
 const SideBox: FC = () => {
-  const [tagIds, setTagIds] = useState([])
-  const [typeIds, setTypeIds] = useState([])
+  const {state, dispatch} = useSearch()
+  const {text, tagIds, typeIds} = state
 
   const onTagClick = (id: string) => {
     const ids = tagIds.includes(id)
       ? tagIds.filter((tagId) => tagId !== id)
       : [...tagIds, id]
 
-    setTagIds(ids)
+    dispatch({tagIds: ids})
   }
 
   const onTypeClick = (type: MediaType) => {
@@ -38,13 +39,13 @@ const SideBox: FC = () => {
       ? typeIds.filter((typeId) => typeId !== type)
       : [...typeIds, type]
 
-    setTypeIds(ids)
+    dispatch({typeIds: ids})
   }
 
   const {loading, data} = useQuery<Pick<Query, 'tag'>>(GET_TAGS)
 
   if (loading) {
-    return <SideBoxLoading/>
+    return <SideBoxLoading />
   }
 
   const {tag: tags} = data
@@ -70,6 +71,8 @@ const SideBox: FC = () => {
         type="text"
         className="w-full py-1 pl-2 rounded border border-gray-300 focus:outline-none"
         placeholder="Search"
+        value={text}
+        onChange={(e) => dispatch({text: e.target.value})}
       />
 
       <div className="mt-4 p-2">
@@ -131,24 +134,46 @@ const GET_PLAYLISTS = gql`
   }
 `
 
+type PlaylistListProps = {
+  playlists: Playlist[]
+}
+
+const PlaylistList: FC<PlaylistListProps> = ({playlists}) => {
+  // const {state} = useSearch()
+  // const {tagIds, typeIds} = state
+
+  // const filtered = playlists.map((playlist) => ({
+  //   playlist,
+  //   tagIds: playlist?.media.map(({tagIds}) => tagIds),
+  //   typeIds: playlist?.media.map(({type}) => type),
+  // })).filter((item) => item.tagIds.includes(tagIds))
+  // .map(({playlist}) => playlist)
+
+  return (
+    <div className="px-10 mt-8 mx-auto">
+    {playlists.map((playlist) => (
+      <PlaylistCard key={playlist._id} playlist={playlist} />
+    ))}
+  </div>
+  )
+}
+
 const Playlists: NextPage = () => {
   const {loading, data} = useQuery<Pick<Query, 'playlists'>>(GET_PLAYLISTS)
 
   if (loading) {
-    return <MainLoading/>
+    return <MainLoading />
   }
 
-  console.log(data)
   const {playlists} = data
 
+
   return (
-    <Layout SideComponent={SideBox}>
-      <div className="px-10 mt-8 mx-auto">
-        {playlists.map((playlist) => (
-          <PlaylistCard key={playlist._id} playlist={playlist} />
-        ))}
-      </div>
-    </Layout>
+    <SearchProvider>
+      <Layout SideComponent={SideBox}>
+        <PlaylistList playlists={playlists} />
+      </Layout>
+    </SearchProvider>
   )
 }
 
