@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faPaperPlane} from '@fortawesome/free-solid-svg-icons'
 import {gql, useMutation} from '@apollo/client'
 import {
+  Me,
   Media,
   Mutation,
   MutationCreateCommentArgs,
@@ -24,9 +25,10 @@ const CREATE_COMMENT = gql`
 
 type CommentBoxProps = {
   media: Media
+  me: Me
 }
 
-const CommentBox: FC<CommentBoxProps> = ({media}) => {
+const CommentBox: FC<CommentBoxProps> = ({media, me}) => {
   const [text, setText] = useState('')
   const [createComment] = useMutation<
     Pick<Mutation, 'createComment'>,
@@ -37,7 +39,7 @@ const CommentBox: FC<CommentBoxProps> = ({media}) => {
     createComment({
       variables: {
         args: {
-          userId: media.playlist.user._id,
+          userId: me.userId,
           mediaId: media._id,
           text,
         },

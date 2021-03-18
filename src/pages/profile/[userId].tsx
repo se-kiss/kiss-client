@@ -7,6 +7,33 @@ import {ProfileCard} from '../../components/Profile'
 import {PlaylistCard} from '../../components/Playlist'
 import {MainLoading} from '../../components/Loading'
 
+const GET_USER = gql`
+  query GetUser($args: GetUsersArgs) {
+    user(args: $args) {
+      _id
+      firstName
+      lastName
+      profileImageId
+      playlists {
+        _id
+        name
+        tags {
+          _id
+          name
+          color
+        }
+        user {
+          _id
+          firstName
+          lastName
+          profileImageId
+        }
+        _updatedAt
+      }
+    }
+  }
+`
+
 const Profile: NextPage = () => {
   const router = useRouter()
   const {userId} = router.query
@@ -14,32 +41,6 @@ const Profile: NextPage = () => {
   if (!userId) {
     return <MainLoading />
   }
-
-  const GET_USER = gql`
-    query GetUser($args: GetUsersArgs!) {
-      user(args: $args) {
-        _id
-        firstName
-        lastName
-        playlists {
-          _id
-          name
-          tags {
-            _id
-            name
-            color
-          }
-          user {
-            _id
-            firstName
-            lastName
-            profileImageId
-          }
-          _updatedAt
-        }
-      }
-    }
-  `
 
   const {loading, data} = useQuery<Pick<Query, 'user'>, QueryUserArgs>(
     GET_USER,

@@ -25,11 +25,7 @@ const ProfileCard: FC<ProfileCardProps> = ({user}) => {
       <div className="flex justify-center">
         <div className="rounded-full w-32 h-32 bg-red-400">
           {profileImageId && (
-            <img
-              className="rounded-full w-full h-32 "
-              src={profileImageId}
-              alt=""
-            />
+            <img className="rounded-full w-full h-32 " src={profileImageId} />
           )}
         </div>
       </div>

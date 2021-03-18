@@ -99,6 +99,7 @@ const Form = () => {
 
       setLoading(false)
       console.log(res.data._id)
+      dispatch({profileImageId: `${process.env.NEXT_PUBLIC_UPLOAD_URL}/img?_id=${res.data._id}`})
     }
 
     if (selectedFile) {
@@ -108,9 +109,9 @@ const Form = () => {
   }
 
   const onSubmit = () => {
-    const {firstName, lastName, email, password} = state
+    const {firstName, lastName, email, password, profileImageId} = state
     createUser({
-      variables: {args: {firstName, lastName}},
+      variables: {args: {firstName, lastName, profileImageId}},
       update: (cache, {data}) => {
         register({
           variables: {
