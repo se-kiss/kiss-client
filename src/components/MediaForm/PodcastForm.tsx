@@ -86,6 +86,7 @@ const PodcastForm: FC = () => {
 
         <input
           type="file"
+          accept="audio/*"
           className="hidden"
           ref={FileInputRef}
           onChange={(e) => selectFile(e.target.files[0])}

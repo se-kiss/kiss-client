@@ -83,6 +83,7 @@ const VideoForm: FC = () => {
 
         <input
           type="file"
+          accept="video/*"
           className="hidden"
           ref={FileInputRef}
           onChange={(e) => selectFile(e.target.files[0])}

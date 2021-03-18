@@ -25,7 +25,9 @@ import {
   Media,
   Query,
   QueryMediaArgs,
+  MutationUpdateIndexArgs,
 } from '../../../../../types/generated/graphql'
+import { MainLoading } from '../../../../../components/Loading'
 
 type MenuButtonProps = {
   active?: boolean
@@ -97,6 +99,14 @@ const UPDATE_MEDIA = gql`
   }
 `
 
+const UPDATE_INDEX = gql`
+  mutation UPDATE_INDEX($args: SearchBody!) {
+    updateIndex(args: $args) {
+      statusCode
+    }
+  }
+`
+
 type FormProps = {
   media: Media
 }
@@ -108,6 +118,11 @@ const Form: FC<FormProps> = ({media}) => {
     Pick<Mutation, 'updateMedia'>,
     MutationUpdateMediaArgs
   >(UPDATE_MEDIA)
+
+  const [updateIndex] = useMutation<
+    Pick<Mutation, 'updateIndex'>,
+    MutationUpdateIndexArgs
+  >(UPDATE_INDEX)
 
   useEffect(() => {
     const {name, description, paragraph, tagIds, videoId, podcastKey} = media
@@ -133,7 +148,7 @@ const Form: FC<FormProps> = ({media}) => {
   }
 
   const onUpdateClick = () => {
-    const {name, tagIds, paragraph, videoId, podcastKey} = formState
+    const {name, tagIds, paragraph, videoId, podcastKey, description} = formState
 
     updateMedia({
       variables: {
@@ -143,12 +158,27 @@ const Form: FC<FormProps> = ({media}) => {
           tagIds,
           paragraph,
           videoId,
-          podcastKey
+          podcastKey,
+          description
         },
       },
-      update: (cache) => {
-        cache.reset()
-        closeForm()
+      update: () => {
+        updateIndex({
+          variables: {
+            args: {
+              playlistId: media.playlist._id,
+              name: media.name,
+              ownerName: `${media.playlist.user.firstName} ${media.playlist.user.lastName}`,
+              tags: media.tagIds,
+              type: media.type,
+              description
+            }
+          },
+          update: (cache) => {
+            cache.reset()
+            closeForm()
+          }
+        })
       },
     })
   }
@@ -204,7 +234,7 @@ const MediaForm: NextPage = () => {
   const {id: playlistId, mediaId} = router.query
 
   if (!playlistId || !mediaId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(
@@ -219,7 +249,7 @@ const MediaForm: NextPage = () => {
   )
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {media} = data

@@ -27,6 +27,7 @@ import {
   MediaType,
   Mutation,
   MutationDeleteMediaArgs,
+  MutationRemoveIndexArgs,
   Query,
   QueryMediaArgs,
 } from '../../../../../types/generated/graphql'
@@ -58,6 +59,12 @@ const DELETE_MEDIA = gql`
   }
 `
 
+const REMOVE_INDEX = gql`
+  mutation RemoveIndex($args: DeleteArgs) {
+    statusCode
+  }
+`
+
 const ConfirmDeleteMedia: FC = () => {
   const router = useRouter()
   const {id: playlistId, mediaId} = router.query
@@ -67,6 +74,11 @@ const ConfirmDeleteMedia: FC = () => {
     Pick<Mutation, 'deleteMedia'>,
     MutationDeleteMediaArgs
   >(DELETE_MEDIA)
+
+  const [removeIndex] = useMutation<
+    Pick<Mutation, 'removeIndex'>,
+    MutationRemoveIndexArgs
+  >(REMOVE_INDEX)
 
   if (!playlistId || !mediaId) {
     return <h1>Loading...</h1>
@@ -88,9 +100,18 @@ const ConfirmDeleteMedia: FC = () => {
           _id: mediaId as string,
         },
       },
-      update: (cache) => {
-        cache.reset()
-        router.push(`/playlists/${playlistId}/media`)
+      update: () => {
+        removeIndex({
+          variables: {
+            args: {
+              playlistId: playlistId as string,
+            },
+          },
+          update: (cache) => {
+            cache.reset()
+            router.push(`/playlists/${playlistId}/media`)
+          },
+        })
       },
     })
     closeModal()

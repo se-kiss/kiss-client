@@ -24,8 +24,9 @@ import {
   MediaType,
   MutationCreateReactionArgs,
   ReactionType,
+  MutationIndexMediaArgs,
 } from '../../../../types/generated/graphql'
-import { MainLoading } from '../../../../components/Loading'
+import {MainLoading} from '../../../../components/Loading'
 
 type MenuButtonProps = {
   active?: boolean
@@ -96,6 +97,14 @@ const CREATE_MEDIA = gql`
   mutation CreateMedia($args: CreateMediaArgs!) {
     createMedia(args: $args) {
       _id
+      playlist {
+        _id
+        user {
+          _id
+          firstName
+          lastName
+        }
+      }
     }
   }
 `
@@ -104,6 +113,14 @@ const CREATE_REACTION = gql`
   mutation CreateReaction($args: CreateReactionArgs!) {
     createReaction(args: $args) {
       _id
+    }
+  }
+`
+
+const INDEX_MEDIA = gql`
+  mutation IndexMedia($args: SearchBody!) {
+    indexMedia(args: $args) {
+      statusCode
     }
   }
 `
@@ -124,6 +141,11 @@ const Form: FC<FormProps> = ({playlistId}) => {
     Pick<Mutation, 'createReaction'>,
     MutationCreateReactionArgs
   >(CREATE_REACTION)
+
+  const [indexMedia] = useMutation<
+    Pick<Mutation, 'indexMedia'>,
+    MutationIndexMediaArgs
+  >(INDEX_MEDIA)
 
   const closeForm = () => {
     dispatchForm({type: MediaFormActionTypes.ResetForm})
@@ -146,6 +168,7 @@ const Form: FC<FormProps> = ({playlistId}) => {
         },
       },
       update: (cache, {data}) => {
+        const {playlist: {user: owner}} = data.createMedia
         createReaction({
           variables: {
             args: {
@@ -155,10 +178,24 @@ const Form: FC<FormProps> = ({playlistId}) => {
               downVote: [],
             },
           },
-          update: (cache) => {
-            console.log('ok')
-            cache.reset()
-            closeForm()
+          update: () => {
+            indexMedia({
+              variables: {
+                args: {
+                  playlistId,
+                  name,
+                  ownerName: `${owner.firstName} ${owner.lastName}`,
+                  tags: tagIds,
+                  type: mediaType,
+                  description,
+                },
+              },
+              update: (cache) => {
+                console.log('ok')
+                cache.reset()
+                closeForm()
+              },
+            })
           },
         })
       },
