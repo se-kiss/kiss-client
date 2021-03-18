@@ -1,9 +1,10 @@
-import {FC, createRef} from 'react'
+import {FC, createRef, useState} from 'react'
 import styled from 'styled-components'
+import axios from 'axios'
 import useMediaForm, {MediaFormActionTypes} from '../../lib/useMediaForm'
 import {MediaFormHeader} from './'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faUpload} from '@fortawesome/free-solid-svg-icons'
+import {faFileAlt, faUpload} from '@fortawesome/free-solid-svg-icons'
 
 const Button = styled.button`
   color: white;
@@ -11,12 +12,40 @@ const Button = styled.button`
 `
 
 const PodcastForm: FC = () => {
+  const [loading, setLoading] = useState(null)
+  const [selectedFile, selectFile] = useState(null)
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
   const {description} = formState
   const FileInputRef = createRef<HTMLInputElement>()
 
-  const onUploadVideo = () => {
+  const onPodcastSelect = () => {
     FileInputRef.current.click()
+  }
+
+  const onPodcastUpload = () => {
+    const postPodcast = async () => {
+      const data = new FormData()
+
+      data.append('podcast', selectedFile)
+      data.append('podcastName', selectFile.name)
+
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/podcast`,
+        data
+      )
+
+      // const podcastKey = res.data.uri
+      //   ? `https://player.vimeo.com/${res.data.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
+      //   : null
+
+        console.log(res.data)
+
+      // dispatchForm({type: MediaFormActionTypes.SetPodcastKey, payload: {podcastKey}})
+      setLoading(false)
+    }
+
+    setLoading(true)
+    postPodcast()
   }
 
   const onEditDescription = (text: string) => {
@@ -30,20 +59,36 @@ const PodcastForm: FC = () => {
 
   return (
     <>
-      <div className="w-full h-36 bg-black rounded-t-xl flex justify-center items-center">
+      <div className="w-full h-36 bg-black rounded-t-xl flex flex-col justify-center items-center">
         <Button
-          className="text-lg font-medium px-8 py-1 rounded focus:outline-none hover:bg-red-400"
-          onClick={onUploadVideo}
+          className={`text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none ${
+            selectedFile && 'bg-red-400'
+          } hover:bg-red-400`}
+          onClick={onPodcastSelect}
+        >
+          <FontAwesomeIcon icon={faFileAlt} />
+          <span className="ml-2">{!selectedFile ? 'Select File' : 'File'}</span>
+        </Button>
+
+        <Button
+          className="text-lg font-medium px-8 py-1 my-2 rounded focus:outline-none hover:bg-red-400"
+          onClick={onPodcastUpload}
         >
           <FontAwesomeIcon icon={faUpload} />
-          <span className="ml-2">Upload</span>
+          <span className="ml-2">
+            {loading === null
+              ? 'Upload'
+              : loading
+              ? 'Uploading...'
+              : 'Complete'}
+          </span>
         </Button>
 
         <input
           type="file"
           className="hidden"
           ref={FileInputRef}
-          onChange={(e) => console.log(e.target.files)}
+          onChange={(e) => selectFile(e.target.files[0])}
         />
       </div>
 

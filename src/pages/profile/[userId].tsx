@@ -5,7 +5,7 @@ import {gql, useQuery} from '@apollo/client'
 import {Query, QueryUserArgs} from '../../types/generated/graphql'
 import {ProfileCard} from '../../components/Profile'
 import {PlaylistCard} from '../../components/Playlist'
-import { MainLoading } from '../../components/Loading'
+import {MainLoading} from '../../components/Loading'
 
 const Profile: NextPage = () => {
   const router = useRouter()
@@ -16,8 +16,8 @@ const Profile: NextPage = () => {
   }
 
   const GET_USER = gql`
-    query GetUser {
-      user {
+    query GetUser($args: GetUsersArgs!) {
+      user(args: $args) {
         _id
         firstName
         lastName
