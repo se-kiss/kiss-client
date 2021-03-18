@@ -27,16 +27,15 @@ const PodcastForm: FC = () => {
       const data = new FormData()
 
       data.append('podcast', selectedFile)
-      data.append('podcastName', selectedFile.name)
 
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/podcast`,
+        `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/podcast?podcastName=${selectedFile.name}`,
         data
       )
 
       // <iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2FNestZ671%2Fa77f8074b7fcc758ed2b387aac31ab17%2F" frameborder="0" ></iframe>
-      const podcastKey = res.data.uri
-        ? `https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=${res.data.uri}`
+      const podcastKey = res.data?.result?.key
+        ? `https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=${res.data.result.key}`
         : null
 
       console.log(podcastKey)
