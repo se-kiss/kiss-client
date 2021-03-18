@@ -2,10 +2,48 @@ import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {Layout} from '../../components'
 import {gql, useQuery} from '@apollo/client'
-import {Query, QueryUserArgs} from '../../types/generated/graphql'
+import {
+  Query,
+  QueryUserArgs,
+} from '../../types/generated/graphql'
 import {ProfileCard} from '../../components/Profile'
 import {PlaylistCard} from '../../components/Playlist'
 import {MainLoading} from '../../components/Loading'
+
+const GET_USER = gql`
+  query GetUser($args: GetUsersArgs) {
+    user(args: $args) {
+      _id
+      firstName
+      lastName
+      profileImageId
+      playlists {
+        _id
+        name
+        tags {
+          _id
+          name
+          color
+        }
+        user {
+          _id
+          firstName
+          lastName
+          profileImageId
+        }
+        _updatedAt
+      }
+    }
+  }
+`
+
+const GET_ME = gql`
+  query GetMe {
+    me {
+      userId
+    }
+  }
+`
 
 const Profile: NextPage = () => {
   const router = useRouter()
@@ -15,33 +53,7 @@ const Profile: NextPage = () => {
     return <MainLoading />
   }
 
-  const GET_USER = gql`
-    query GetUser($args: GetUsersArgs!) {
-      user(args: $args) {
-        _id
-        firstName
-        lastName
-        playlists {
-          _id
-          name
-          tags {
-            _id
-            name
-            color
-          }
-          user {
-            _id
-            firstName
-            lastName
-            profileImageId
-          }
-          _updatedAt
-        }
-      }
-    }
-  `
-
-  const {loading, data} = useQuery<Pick<Query, 'user'>, QueryUserArgs>(
+  const {loading: userLoading, data: userData} = useQuery<Pick<Query, 'user'>, QueryUserArgs>(
     GET_USER,
     {
       variables: {
@@ -52,16 +64,21 @@ const Profile: NextPage = () => {
     }
   )
 
-  if (loading) {
+  const {loading: meLoading, data: meData} = useQuery<Pick<Query, 'me'>>(
+    GET_ME
+  )
+
+  if (userLoading || meLoading) {
     return <MainLoading />
   }
 
-  const {user} = data
+  const {user} = userData
+  const {me} = meData
 
   return (
     <Layout>
       <div className="px-10 mt-8 mx-auto">
-        <ProfileCard key={user[0]._id} user={user[0]} />
+        <ProfileCard user={user[0]} {...{user: user[0], me}} />
         <div className="px-10 mt-8 mx-auto">
           {user[0].playlists.map((playlist) => (
             <PlaylistCard key={playlist._id} playlist={playlist} />

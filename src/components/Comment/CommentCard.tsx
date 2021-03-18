@@ -4,12 +4,14 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {FC, useState} from 'react'
 import {
   Comment,
+  Me,
   Mutation,
   MutationDeleteCommentArgs,
 } from '../../types/generated/graphql'
 
 type CommentCardProps = {
   comment: Comment
+  me: Me
 }
 
 const DELETE_COMMENT = gql`
@@ -20,7 +22,7 @@ const DELETE_COMMENT = gql`
   }
 `
 
-const CommentCard: FC<CommentCardProps> = ({comment}) => {
+const CommentCard: FC<CommentCardProps> = ({comment, me}) => {
   const {text} = comment
   const [hover, setHover] = useState(false)
   const [deleteComment] = useMutation<
@@ -41,6 +43,7 @@ const CommentCard: FC<CommentCardProps> = ({comment}) => {
     })
   }
 
+  console.log(me?.userId, comment.user._id)
   return (
     <div
       className="flex flex-row justify-between items-center my-4"
@@ -48,12 +51,17 @@ const CommentCard: FC<CommentCardProps> = ({comment}) => {
       onMouseLeave={() => setHover(false)}
     >
       <div className="flex flex-row items-center">
-        <div className="w-6 h-6 bg-red-400 rounded-full" />
+        {/* <div className="w-6 h-6 bg-red-400 rounded-full" /> */}
+        <div className="rounded-full w-6 h-6 bg-red-400">
+          {comment?.user?.profileImageId && (
+            <img className="rounded-full w-full h-6" src={comment?.user?.profileImageId} />
+          )}
+        </div>
         <h2 className="shadow p-2 ml-4 mr-6">{text}</h2>
       </div>
 
       {/* TODO: replace hardcord */}
-      {comment.user._id === '605106b54d80c94de1f2d1d3' && hover && (
+      {comment.user._id === me?.userId && hover && (
         <div>
           <FontAwesomeIcon
             icon={faTrashAlt}

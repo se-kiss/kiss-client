@@ -2,10 +2,13 @@ import {
     createContext,
     FC,
     useReducer,
-    useContext
+    useContext,
+    Dispatch,
+    Reducer
 } from 'react'
 
 type RegisterState = {
+    profileImageId: string
     email: string
     firstName: string
     lastName: string
@@ -14,6 +17,7 @@ type RegisterState = {
 }
 
 const initialState: RegisterState = {
+    profileImageId: '',
     email: '',
     firstName: '',
     lastName: '',
@@ -23,7 +27,7 @@ const initialState: RegisterState = {
 
 interface IRegisterContext {
     state: RegisterState
-    dispatch: any
+    dispatch: Dispatch<Partial<RegisterState>>
 }
 
 const RegisterContext = createContext<IRegisterContext>({
@@ -31,7 +35,7 @@ const RegisterContext = createContext<IRegisterContext>({
     dispatch: () => null,
 })
 
-const reducer = (
+const reducer: Reducer<RegisterState, Partial<RegisterState>> = (
     prev,
     current
 ) => {

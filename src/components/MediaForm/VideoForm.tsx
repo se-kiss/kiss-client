@@ -34,7 +34,7 @@ const VideoForm: FC = () => {
       )
 
       const videoId = res.data.uri
-        ? `https://player.vimeo.com/${res.data.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
+        ? `https://player.vimeo.com${res.data.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
         : null
 
       dispatchForm({type: MediaFormActionTypes.SetVideoId, payload: {videoId}})

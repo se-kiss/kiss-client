@@ -46,6 +46,7 @@ const GET_ME = gql`
       user {
         firstName
         lastName
+        profileImageId
       }
     }
   }
@@ -124,8 +125,17 @@ const NavbarEnd: FC = () => {
         className="flex flex-row items-center mx-4 cursor-pointer"
         onClick={onProfileClick}
       >
-        <div className="w-7 h-7 bg-white rounded-full mr-2" />
-        <h1 className="text-md font-medium text-white">{data?.me?.user?.firstName} {data?.me?.user?.lastName}</h1>
+        <div className="rounded-full w-7 h-7 bg-white mr-2">
+          {data?.me?.user?.profileImageId && (
+            <img
+              className="rounded-full w-full h-7 "
+              src={data?.me?.user?.profileImageId}
+            />
+          )}
+        </div>
+        <h1 className="text-md font-medium text-white">
+          {data?.me?.user?.firstName} {data?.me?.user?.lastName}
+        </h1>
       </div>
 
       <IconButton

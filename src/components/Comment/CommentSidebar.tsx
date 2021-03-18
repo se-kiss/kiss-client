@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {faTimes} from '@fortawesome/free-solid-svg-icons'
 import {CommentBox, CommentCard} from './'
 import useSidebar, {SidebarActionTypes} from '../../lib/useSidebar'
-import {Media, Query, QueryCommentsArgs} from '../../types/generated/graphql'
+import {Me, Media, Query, QueryCommentsArgs} from '../../types/generated/graphql'
 import {gql, useQuery} from '@apollo/client'
 import {CommentListLoading} from '../Loading'
 
@@ -16,16 +16,19 @@ const GET_COMMENTS = gql`
         _id
         firstName
         lastName
+        profileImageId
       }
     }
   }
 `
 
+
 type CommentListProps = {
   media: Media
+  me: Me
 }
 
-const CommentList: FC<CommentListProps> = ({media}) => {
+const CommentList: FC<CommentListProps> = ({media, me}) => {
   const {loading, data} = useQuery<Pick<Query, 'comments'>, QueryCommentsArgs>(
     GET_COMMENTS,
     {
@@ -48,11 +51,19 @@ const CommentList: FC<CommentListProps> = ({media}) => {
   return (
     <div className="overflow-y-auto h-4/5 mt-2">
       {comments.map((comment) => (
-        <CommentCard key={comment._id} comment={comment} />
+        <CommentCard key={comment._id}  {...{comment, me}} />
       ))}
     </div>
   )
 }
+
+const GET_ME = gql`
+  query Me {
+    me {
+      userId
+    }
+  }
+`
 
 type CommentSidebarProps = {
   media: Media
@@ -65,6 +76,13 @@ const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
       type: SidebarActionTypes.HideSidebar,
     })
   }
+  const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
+
+  if (loading) {
+    return <CommentListLoading />
+  }
+
+  const {me} = data
 
   return (
     <div className="p-4 w-full h-full">
@@ -78,9 +96,9 @@ const CommentSidebar: FC<CommentSidebarProps> = ({media}) => {
         />
       </div>
 
-      <CommentList media={media} />
+      <CommentList {...{media, me}} />
 
-      <CommentBox media={media} />
+      <CommentBox {...{media, me}} />
     </div>
   )
 }
