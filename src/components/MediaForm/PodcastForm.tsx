@@ -27,20 +27,24 @@ const PodcastForm: FC = () => {
       const data = new FormData()
 
       data.append('podcast', selectedFile)
-      data.append('podcastName', selectFile.name)
+      data.append('podcastName', selectedFile.name)
 
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_UPLOAD_URL}/upload/podcast`,
         data
       )
 
-      // const podcastKey = res.data.uri
-      //   ? `https://player.vimeo.com/${res.data.uri}?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479`
-      //   : null
+      // <iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=%2FNestZ671%2Fa77f8074b7fcc758ed2b387aac31ab17%2F" frameborder="0" ></iframe>
+      const podcastKey = res.data.uri
+        ? `https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed=${res.data.uri}`
+        : null
 
-        console.log(res.data)
+      console.log(podcastKey)
 
-      // dispatchForm({type: MediaFormActionTypes.SetPodcastKey, payload: {podcastKey}})
+      dispatchForm({
+        type: MediaFormActionTypes.SetPodcastKey,
+        payload: {podcastKey},
+      })
       setLoading(false)
     }
 
