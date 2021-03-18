@@ -5,18 +5,19 @@ import {gql, useQuery} from '@apollo/client'
 import {Query, QueryUserArgs} from '../../types/generated/graphql'
 import {ProfileCard} from '../../components/Profile'
 import {PlaylistCard} from '../../components/Playlist'
+import {MainLoading} from '../../components/Loading'
 
 const Profile: NextPage = () => {
   const router = useRouter()
   const {userId} = router.query
 
   if (!userId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const GET_USER = gql`
-    query GetUser {
-      user {
+    query GetUser($args: GetUsersArgs!) {
+      user(args: $args) {
         _id
         firstName
         lastName
@@ -32,6 +33,7 @@ const Profile: NextPage = () => {
             _id
             firstName
             lastName
+            profileImageId
           }
           _updatedAt
         }
@@ -51,18 +53,14 @@ const Profile: NextPage = () => {
   )
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {user} = data
-  //todo: connect users with api
 
   return (
     <Layout>
       <div className="px-10 mt-8 mx-auto">
-        {/* {user.map((currentUser) => (
-          <ProfileCard key={currentUser._id} user={currentUser} />
-        ))} */}
         <ProfileCard key={user[0]._id} user={user[0]} />
         <div className="px-10 mt-8 mx-auto">
           {user[0].playlists.map((playlist) => (

@@ -1,5 +1,5 @@
 import {faNewspaper} from '@fortawesome/free-regular-svg-icons'
-import {faVideo} from '@fortawesome/free-solid-svg-icons'
+import {faMicrophoneAlt, faVideo} from '@fortawesome/free-solid-svg-icons'
 import {NextPage} from 'next'
 import {useRouter} from 'next/router'
 import {FC, useEffect} from 'react'
@@ -8,6 +8,7 @@ import {
   ArticleForm,
   VideoForm,
   MediaFormButtons,
+  PodcastForm,
 } from '../../../../../components/MediaForm'
 import useMediaForm, {
   MediaFormActionTypes,
@@ -24,7 +25,9 @@ import {
   Media,
   Query,
   QueryMediaArgs,
+  MutationUpdateIndexArgs,
 } from '../../../../../types/generated/graphql'
+import { MainLoading } from '../../../../../components/Loading'
 
 type MenuButtonProps = {
   active?: boolean
@@ -60,6 +63,13 @@ const SideBox: FC<SideBoxProps> = ({media}) => {
           name: 'Video',
           icon: faVideo,
         }
+
+      case MediaType.Podcast:
+        return {
+          type: MediaType.Podcast,
+          name: 'Podcast',
+          icon: faMicrophoneAlt,
+        }
     }
   })(media.type)
 
@@ -89,6 +99,14 @@ const UPDATE_MEDIA = gql`
   }
 `
 
+const UPDATE_INDEX = gql`
+  mutation UPDATE_INDEX($args: SearchBody!) {
+    updateIndex(args: $args) {
+      statusCode
+    }
+  }
+`
+
 type FormProps = {
   media: Media
 }
@@ -96,13 +114,18 @@ type FormProps = {
 const Form: FC<FormProps> = ({media}) => {
   const router = useRouter()
   const {state: formState, dispatch: dispatchForm} = useMediaForm()
-  const [createMedia] = useMutation<
+  const [updateMedia] = useMutation<
     Pick<Mutation, 'updateMedia'>,
     MutationUpdateMediaArgs
   >(UPDATE_MEDIA)
 
+  const [updateIndex] = useMutation<
+    Pick<Mutation, 'updateIndex'>,
+    MutationUpdateIndexArgs
+  >(UPDATE_INDEX)
+
   useEffect(() => {
-    const {name, description, paragraph, tagIds} = media
+    const {name, description, paragraph, tagIds, videoId, podcastKey} = media
     dispatchForm({
       type: MediaFormActionTypes.SetForm,
       payload: {
@@ -111,9 +134,11 @@ const Form: FC<FormProps> = ({media}) => {
         tagIds,
         mediaType: media.type,
         paragraph: {
-          value: paragraph
+          value: paragraph,
         },
-      }
+        videoId,
+        podcastKey,
+      },
     })
   }, [])
 
@@ -123,20 +148,37 @@ const Form: FC<FormProps> = ({media}) => {
   }
 
   const onUpdateClick = () => {
-    const {name, tagIds, paragraph} = formState
+    const {name, tagIds, paragraph, videoId, podcastKey, description} = formState
 
-    createMedia({
+    updateMedia({
       variables: {
         args: {
           _id: media._id,
           name,
           tagIds,
           paragraph,
+          videoId,
+          podcastKey,
+          description
         },
       },
-      update: (cache) => {
-        cache.reset()
-        closeForm()
+      update: () => {
+        updateIndex({
+          variables: {
+            args: {
+              playlistId: media.playlist._id,
+              name: media.name,
+              ownerName: `${media.playlist.user.firstName} ${media.playlist.user.lastName}`,
+              tags: media.tagIds,
+              type: media.type,
+              description
+            }
+          },
+          update: (cache) => {
+            cache.reset()
+            closeForm()
+          }
+        })
       },
     })
   }
@@ -147,6 +189,8 @@ const Form: FC<FormProps> = ({media}) => {
         return ArticleForm
       case MediaType.Clip:
         return VideoForm
+      case MediaType.Podcast:
+        return PodcastForm
     }
   })(formState.mediaType)
 
@@ -154,7 +198,11 @@ const Form: FC<FormProps> = ({media}) => {
     <div>
       <FormComponent />
       <div className="py-4">
-        <MediaFormButtons update onSubmit={onUpdateClick} onCancel={closeForm} />
+        <MediaFormButtons
+          update
+          onSubmit={onUpdateClick}
+          onCancel={closeForm}
+        />
       </div>
     </div>
   )
@@ -186,7 +234,7 @@ const MediaForm: NextPage = () => {
   const {id: playlistId, mediaId} = router.query
 
   if (!playlistId || !mediaId) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {loading, data} = useQuery<Pick<Query, 'media'>, QueryMediaArgs>(
@@ -201,7 +249,7 @@ const MediaForm: NextPage = () => {
   )
 
   if (loading) {
-    return <h1>Loading...</h1>
+    return <MainLoading />
   }
 
   const {media} = data

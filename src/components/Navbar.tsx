@@ -60,7 +60,8 @@ const NavbarEnd: FC = () => {
   const {loading, data} = useQuery<Pick<Query, 'me'>>(GET_ME)
 
   if (loading) {
-    return <h1>Loading...</h1>
+    // TODO: replace with loading
+    return null
   }
 
   const onProfileClick = () => {

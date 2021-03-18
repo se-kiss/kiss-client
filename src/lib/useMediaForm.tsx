@@ -22,6 +22,7 @@ type MediaFormState = {
   description?: string
   tagIds: string[]
   videoId: string
+  podcastKey: string
 }
 
 const initialState: MediaFormState = {
@@ -33,6 +34,7 @@ const initialState: MediaFormState = {
   description: '',
   tagIds: [],
   videoId: null,
+  podcastKey: null,
 }
 
 export enum MediaFormActionTypes {
@@ -46,6 +48,7 @@ export enum MediaFormActionTypes {
   FocusParagraph = 'FOCUS_PARAGRAPH',
   EditDescription = 'EDIT_DESCRIPTION',
   SetVideoId = 'SET_VIDEO_ID',
+  SetPodcastKey = 'SET_PODCAST_KEY',
   SetForm = 'SET_FORM',
   ResetForm = 'RESET_FORM',
 }
@@ -120,6 +123,12 @@ const reducer: Reducer<MediaFormState, MediaFormAction> = (state, action) => {
       return {
         ...state,
         videoId: action.payload.videoId,
+      }
+
+    case MediaFormActionTypes.SetPodcastKey:
+      return {
+        ...state,
+        podcastKey: action.payload.videoId,
       }
 
     case MediaFormActionTypes.SetForm: {
