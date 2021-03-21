@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {
-  Me,
+  // Me,
   Mutation,
   MutationUpdateSubscriptionArgs,
   Query,
@@ -24,7 +24,7 @@ const Button = styled.button`
 
 type ProfileCardProps = {
   user: User
-  me: Me
+  // me: Me
 }
 
 const UPDATE_SUBSCRIPTION = gql`
@@ -45,7 +45,7 @@ const GET_SUBSCRIPTION = gql`
   }
 `
 
-const ProfileCard: FC<ProfileCardProps> = ({user, me}) => {
+const ProfileCard: FC<ProfileCardProps> = ({user}) => {
   const {firstName, lastName, profileImageId} = user
 
   const {loading, data} = useQuery<
@@ -75,17 +75,17 @@ const ProfileCard: FC<ProfileCardProps> = ({user, me}) => {
     : false
 
   const onFollowClick = () => {
-    updateSubscription({
-      variables: {
-        args: {
-          userId: me.userId,
-          following: user._id,
-        },
-      },
-      update: (cache) => {
-        cache.reset()
-      },
-    })
+    // updateSubscription({
+    //   variables: {
+    //     args: {
+    //       userId: me.userId,
+    //       following: user._id,
+    //     },
+    //   },
+    //   update: (cache) => {
+    //     cache.reset()
+    //   },
+    // })
   }
 
   return (
@@ -107,7 +107,7 @@ const ProfileCard: FC<ProfileCardProps> = ({user, me}) => {
         <h1 className="px-2 text-sm">
           {subscription.following ? subscription.following.length : 0} following
         </h1>
-        {me.userId !== user._id &&
+        {user._id &&
           (!alreadyFollow ? (
             <OutlinedButton
               className="px-4 rounded text-sm font-medium focus:outline-none"

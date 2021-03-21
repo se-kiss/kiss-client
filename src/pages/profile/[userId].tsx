@@ -37,13 +37,13 @@ const GET_USER = gql`
   }
 `
 
-const GET_ME = gql`
-  query GetMe {
-    me {
-      userId
-    }
-  }
-`
+// const GET_ME = gql`
+//   query GetMe {
+//     me {
+//       userId
+//     }
+//   }
+// `
 
 const Profile: NextPage = () => {
   const router = useRouter()
@@ -64,21 +64,21 @@ const Profile: NextPage = () => {
     }
   )
 
-  const {loading: meLoading, data: meData} = useQuery<Pick<Query, 'me'>>(
-    GET_ME
-  )
+  // const {loading: meLoading, data: meData} = useQuery<Pick<Query, 'me'>>(
+  //   GET_ME
+  // )
 
-  if (userLoading || meLoading) {
+  if (userLoading) {
     return <MainLoading />
   }
 
   const {user} = userData
-  const {me} = meData
+  // const {me} = meData
 
   return (
     <Layout>
       <div className="px-10 mt-8 mx-auto">
-        <ProfileCard user={user[0]} {...{user: user[0], me}} />
+        <ProfileCard user={user[0]} {...{user: user[0]}} />
         <div className="px-10 mt-8 mx-auto">
           {user[0].playlists.map((playlist) => (
             <PlaylistCard key={playlist._id} playlist={playlist} />
